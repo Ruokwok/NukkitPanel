@@ -1,0 +1,188 @@
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1, user-scalable=0, minimal-ui">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    {{web.src}}
+	
+	
+</head>
+<body class="mdui-theme-primary-indigo mdui-drawer-body-left mdui-color-grey-300">
+
+{{web.header}}
+{{web.drawer}}
+
+<div class="mdui-container">
+  <div class="mdui-row">
+	<div class="mdui-col-xs-12">
+      <div class="mdui-card" style="margin:1%">
+		<div style="display:flex;justify-content:space-around;flex-wrap:wrap">
+			<div style="margin:1%;margin-top:2%"><div class="load"></div><p align="center">{{load}}</p></div>
+			<div style="margin:1%;margin-top:2%"><div class="jvmm"></div><p align="center">JVM{{memory}}</p></div>
+			<div style="margin:1%;margin-top:2%"><div class="osm"></div><p align="center">{{os-mem}}</p></div>
+			<div style="margin:1%;margin-top:2%"><div class="player"></div><p align="center">{{online}}</p></div>
+		</div>
+      </div>
+	</div>
+	
+	<div class="mdui-col-xs-12 mdui-col-sm-6">
+	<div class="mdui-row">
+	<div class="mdui-col-xs-12">
+      <div class="mdui-card" style="margin:1%">
+		<div class="mdui-card-primary mdui-valign mdui-typo" style="display:flex;justify-content:space-around;flex-wrap:wrap">
+			<div class="mdui-chip mdui-center" style="margin:2%">
+			  <span class="mdui-chip-icon mdui-color-blue"><i class="mdui-icon material-icons">cloud_download</i></span>
+			  <span id="net_up" class="mdui-chip-title">loadding</span>
+			</div>
+			<div class="mdui-chip mdui-center" style="margin:2%">
+			  <span class="mdui-chip-icon mdui-color-green"><i class="mdui-icon material-icons">cloud_upload</i></span>
+			  <span id="net_down" class="mdui-chip-title">loadding</span>
+			</div>
+			<div class="mdui-chip mdui-center" style="margin:2%">
+			  <span class="mdui-chip-icon mdui-color-red"><i class="mdui-icon material-icons">pause_circle_filled</i></span>
+			  <span id="run_time" class="mdui-chip-title">loadding</span>
+			</div>
+		</div>
+	  </div>
+	</div>
+	<div class="mdui-col-xs-12">
+      <div class="mdui-card" style="margin:1%;padding:3%">
+		<div class="mdui-typo">
+			<p><kbd>{{runtime-state}}</kbd></p>
+			<p>{{cpu-load}}<mark id="cpu"></mark></p>
+			<p>{{vm-mem}}<mark id="vmmemory"></mark></p>
+			<p>{{os-mem}}<mark id="osmemory"></mark></p>
+			<p>{{thread}}<mark id="thread"></mark></p>
+			<p><kbd>{{server-info}}</kbd></p>
+			<p>{{kernel}}<mark id="nukkit"></mark></p>
+			<p>{{version}}<mark id="ver"></mark></p>
+			<p>{{protocol}}<mark id="protocol"></mark></p>
+			<p>TPS<mark id="tps"></mark></p>
+			<p>MOTD<mark id="motd"></mark></p>
+		</div>
+	  </div>
+	</div>
+	</div>
+	</div>
+
+	<div class="mdui-col-sx-12 mdui-col-lg-6">
+      <div class="mdui-card" style="margin:1%;padding:3%">
+			<div class="mdui-typo">
+				<p><kbd>{{os-info}}</kbd></p>
+				<p>{{os}}<code id="system"></code></p>
+				<p>{{running-path}}<code id="path"></code></p>
+				<p>{{jre}}<code id="jre"></code></p>
+				<p>CPU<code id="cpuname"></code></p>
+				<p>{{user}}<code id="admin"></code></p>
+			</div>
+      </div>
+	</div>
+  </div>
+	
+</div>
+</body>
+<script>
+	$(".load").circleChart({
+		startAngle:25,
+		color:"#283593",
+		text:"lodding",
+		value:1,
+		size:120,
+	});
+	
+	$(".jvmm").circleChart({
+		startAngle:25,
+		color:"#558B2F",
+		text:"lodding",
+		value:1,
+		size:120,
+	});
+	
+	$(".osm").circleChart({
+		startAngle:25,
+		color:"#FF3D00",
+		text:"lodding",
+		value:1,
+		size:120,
+	});
+	
+	$(".player").circleChart({
+		startAngle:25,
+		color:"#0277BD",
+		text:"lodding",
+		value:1,
+		size:120,
+	});
+</script>
+<script>
+		{{js.websocket}}
+		
+		//建立连接事件
+		ws.onopen = function(evt) {
+			var json = {};
+			json.type = "GET_MAIN";
+			json.token = getToken();
+			send(toString(json));
+			console.log(1)
+		};
+		
+		//消息接收事件
+		ws.onmessage = function(event) {
+			var data = JSON.parse(event.data);
+			console.log(data.type)
+			if(data.type == "NO_PERMISSION") {
+				gotoPage("login");
+			}
+			if(data.type == "SYSTEM") {
+				document.getElementById("cpuname").innerHTML = data.cpuname;
+				document.getElementById("admin").innerHTML = data.admin;
+				document.getElementById("system").innerHTML = data.system;
+				document.getElementById("jre").innerHTML = data.jre;
+				document.getElementById("path").innerHTML = data.path;
+			}
+			if(data.type == "GET_MAIN") {
+				document.getElementById("net_up").innerHTML = data.up + " kB/s";
+				document.getElementById("net_down").innerHTML = data.down + " kB/s";
+				document.getElementById("run_time").innerHTML = data.runtime;
+				document.getElementById("cpu").innerHTML = data.cpu + "%";
+				document.getElementById("osmemory").innerHTML = data.osmemory;
+				document.getElementById("vmmemory").innerHTML = data.vmmemory;
+				document.getElementById("thread").innerHTML = data.thread;
+				document.getElementById("ver").innerHTML = data.ver;
+				document.getElementById("protocol").innerHTML = data.protocol;
+				document.getElementById("tps").innerHTML = data.tps;
+				document.getElementById("motd").innerHTML = data.motd;
+				document.getElementById("nukkit").innerHTML = data.nukkit;
+				var load = data.load;
+				var jvmr = data.jvmr;
+				var osmr = data.osmr;
+				var plr = data.plr;
+				var pmax = data.pmax;
+				var pol = data.pol;
+				$(".load").circleChart({
+					value:load,
+					onDraw: function(el, circle) {
+						circle.text(load + "%");
+					}
+				});
+				$(".jvmm").circleChart({
+					value:jvmr,
+					onDraw: function(el, circle) {
+						circle.text(jvmr + "%");
+					}
+				});
+				$(".osm").circleChart({
+					value:osmr,
+					onDraw: function(el, circle) {
+						circle.text(osmr + "%");
+					}
+				});
+				$(".player").circleChart({
+					value:plr,
+					onDraw: function(el, circle) {
+						circle.text(pol + "/" + pmax);
+					}
+				});
+			}
+		};	
+	</script>
+</html>

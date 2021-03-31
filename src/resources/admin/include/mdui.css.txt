@@ -1,0 +1,1 @@
+http://{{e.address}}/admin/res/css/mdui.min.css

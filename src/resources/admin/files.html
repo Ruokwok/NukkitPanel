@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="initial-scale=1, user-scalable=0, minimal-ui">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<script src="../res/js/spark-md5.min.js"></script>
+    {{web.src}}
+</head>
+<body class="mdui-theme-primary-indigo mdui-drawer-body-left mdui-color-grey-300">
+{{web.header}}
+{{web.drawer}}
+
+<div id="fileList" class="mdui-container mdui-center" style="width:100%">
+<div>
+	<a href="javascript:back();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" id="back">{{return-parent}}</button></a>
+	<a href="javascript:update();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1">{{refresh}}</button></a>
+	<a href="javascript:upload();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1">{{upload}}</button></a>
+	<a href="javascript:create();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1">{{create}}</button></a>
+	<a href="javascript:remove();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" id="del" disabled>{{delete}}</button></a>
+	<a href="javascript:copy();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" id="copyb" disabled>{{copy}}</button></a>
+	<a href="javascript:move();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" id="moveb" disabled>{{move}}</button></a>
+	
+<!--	<button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1">粘贴</button>-->
+	<div class="mdui-typo">
+		<h5 class="mdui-a-2">{{current-location}}:<code id='position'></code></h5>
+	</div>
+	<div class="mdui-table-fluid mdui-typo" style="width:100%">
+  <table class="mdui-table mdui-table-hoverable">
+    <tbody id="list">
+	  <tr>
+		<td>
+		<label class="mdui-checkbox">
+		  <input type="checkbox" disabled/>
+		  <i class="mdui-checkbox-icon"></i>
+		</label>
+		</td>
+        <td><i class="mdui-icon material-icons">folder</i></td>
+        <td>{{return-parent}}</td>
+        <td>{{dir}}</td>
+        <td>#</td>
+        <td>#</td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>
+	
+</div>
+</div>
+<div id="fileEdit" hidden>
+<a href="javascript:save();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" id="del">{{save}}</button></a>
+<a href="javascript:close();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" id="del">{{close}}</button></a>
+<p class="mdui-typo mdui-m-l-3" id="editing" ></p>
+<textarea id="textarea" class="mdui-color-grey-800 mdui-m-a-2 mdui-center" style="resize:none" cols=100% rows=60%></textarea>
+</div>
+
+<div class="mdui-dialog mdui-typo" id="upload">
+ <div class="mdui-dialog-content">
+	<p>{{file-upload}}</p>.
+	<input type="file" id="file">
+	<a href="javascript:selectFile();"><button class="mdui-btn mdui-ripple mdui-color-theme">{{upload}}</button></a>
+ </div>
+ <div class="mdui-dialog-actions">
+    <button class="mdui-btn mdui-ripple" mdui-dialog-cancel>{{close}}</button>
+  </div>
+</div>
+
+<div class="mdui-dialog" id="create">
+ <div class="mdui-dialog-content">
+	<div class="mdui-textfield">
+	  <label class="mdui-textfield-label">{{create-file}}</label>
+	  <input class="mdui-textfield-input" type="text" id="createEdit" placeholder="名称"/>
+	</div>
+ </div>
+ <div class="mdui-dialog-actions">
+    <button class="mdui-btn mdui-ripple" mdui-dialog-cancel>{{file}}</button>
+    <button class="mdui-btn mdui-ripple" mdui-dialog-confirm>{{dir}}</button>
+  </div>
+</div>
+
+<div class="mdui-dialog" id="copy">
+ <div class="mdui-dialog-content">
+	<div class="mdui-textfield">
+	  <label class="mdui-textfield-label">{{target-path}}</label>
+	  <input class="mdui-textfield-input" type="text" id="copyEdit" placeholder="{{leave-blank}}"/>
+	</div>
+ </div>
+ <div class="mdui-dialog-actions">
+    <button class="mdui-btn mdui-ripple" mdui-dialog-cancel>{{cancel}}</button>
+    <button class="mdui-btn mdui-ripple" mdui-dialog-confirm>{{copy}}</button>
+  </div>
+</div>
+
+<div class="mdui-dialog" id="rename">
+ <div class="mdui-dialog-content">
+	<div class="mdui-textfield">
+	  <input class="mdui-textfield-input" type="text" id="renameEdit"/>
+	</div>
+ </div>
+ <div class="mdui-dialog-actions">
+    <button class="mdui-btn mdui-ripple" mdui-dialog-cancel>{{cancel}}</button>
+    <button class="mdui-btn mdui-ripple" mdui-dialog-confirm>{{rename}}</button>
+  </div>
+</div>
+
+<div class="mdui-dialog" id="move">
+ <div class="mdui-dialog-content">
+	<div class="mdui-textfield">
+	  <label class="mdui-textfield-label">{{target-path}}</label>
+	  <input class="mdui-textfield-input" type="text" id="moveEdit" placeholder="{{leave-blank}}"/>
+	</div>
+ </div>
+ <div class="mdui-dialog-actions">
+    <button class="mdui-btn mdui-ripple" mdui-dialog-cancel>{{cancel}}</button>
+    <button class="mdui-btn mdui-ripple" mdui-dialog-confirm>{{move}}</button>
+  </div>
+</div>
+</body>
+<script>
+{{js.websocket}}
+var position = "";
+var selected = new Array();
+var copy;
+var editing
+ws.onopen = function(evt) {
+	var json = {};
+	json.type = "GET_FILES";
+	json.path = "./";
+	json.token = getToken();
+	send(toString(json));
+};
+ws.onmessage = function(event) {
+	var data = JSON.parse(event.data);
+	console.log(data)
+	if(data.type == "NO_PERMISSION") {
+		gotoPage("login");
+	} else if (data.type == "READ_FILE") {
+		if(data.code == 200) {
+			showEdit(data.content, data.file);
+		} else if(data.code == 501) {
+			tips("{{file-is-large}}");
+		}
+	} else {
+		selected .splice(0,selected.length);
+		updataSelect();
+		var pos = document.getElementById('position');
+		position = (data.position == "./")? "": data.position;
+		pos.innerText = position;
+		document.getElementById("back").disabled = (position == "")? true: false;
+		var list = document.getElementById('list');
+		list.innerText = "";
+		var fl = data.list;
+		fl.sort(fileSort1("name"));
+		fl.sort(fileSort2);
+		console.log(fl)
+		for(var i=0;i < fl.length;i++){
+			var tr = document.createElement('tr');
+			var sel = document.createElement('td');
+			var label = document.createElement('label');
+			label.className = "mdui-checkbox";
+			var input = document.createElement('input');
+			//input.type = "checkbox";
+			$(input).attr('type','checkbox');
+			$(input).unbind('click').click(fl[i].name,function(e){select(e.data)});
+			var si = document.createElement('i');
+			si.className = "mdui-checkbox-icon";
+			var itd = document.createElement('td');
+			var ic = document.createElement('i');
+			ic.innerText = (fl[i].dir)? "folder": "description";
+			ic.className = (fl[i].dir)? "mdui-icon material-icons mdui-text-color-orange": "mdui-icon material-icons mdui-text-color-blue";
+			var file = document.createElement('td');
+			file.innerText = fl[i].name;
+			file.setAttribute("onClick", "toPath('"+fl[i].name+"')");
+			var type = document.createElement('td');
+			type.innerText = (fl[i].dir)? "{{dir}}": getType(fl[i].name);
+			var size = document.createElement('td');
+			size.innerText = byteConvert(fl[i].size);
+			var as = document.createElement('td');
+			var adiv = document.createElement('div');
+			adiv.style.width = "200px";
+			var a0 = document.createElement('a');
+			a0.className = "mdui-m-a-1 mdui-float-left";
+			a0.innerText = "{{rename}}";
+			$(a0).unbind('click').click(fl[i].name,function(e){rename(e.data)});
+			var a1 = document.createElement('a');
+			a1.className = "mdui-m-a-1 mdui-float-left";
+			a1.innerText = "{{edit}}";
+			$(a1).unbind('click').click(fl[i].name,function(e){edit(e.data)});
+			var a2 = document.createElement('a');
+			a2.className = "mdui-m-a-1 mdui-float-left";
+			a2.innerText = "{{download}}";
+			$(a2).unbind('click').click(fl[i].name,function(e){download(e.data)});
+			list.appendChild(tr);
+			tr.appendChild(sel);
+			sel.appendChild(label);
+			label.appendChild(input);
+			label.appendChild(si);
+			tr.appendChild(itd);
+			itd.appendChild(ic);
+			tr.appendChild(file);
+			tr.appendChild(size);
+			tr.appendChild(as);
+			tr.appendChild(type);
+			as.appendChild(adiv);
+			adiv.appendChild(a0);
+			if (!fl[i].dir) {
+				adiv.appendChild(a1);
+				adiv.appendChild(a2);
+			}
+		}
+		mdui.updateTables();
+	}
+}
+
+function getType(file) {
+	if (end(file,".yml")) {
+		return "YAML {{config-file}}";
+	}
+	if (end(file,".txt")) {
+		return "{{text}} {{file}}";
+	}
+	if (end(file,".json")) {
+		return "JSON {{file}}";
+	}
+	if (end(file,".properties")) {
+		return "PROPERTIES {{config-file}}";
+	}
+	if (end(file,".jar")) {
+		return "Java{{program}}/{{plugin}}";
+	}
+	return "{{file}}";
+}
+
+function end(str, target) {
+	var start = str.length-target.length;
+    var arr = str.substr(start,target.length);
+    if(arr == target){
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function toPath(path) {
+	var json = {};
+	json.type = "TO_PATH";
+	json.token = getToken();
+	if (path == "@") {
+		json.path = (position == "")? "./": position;
+	} else {
+		json.path = (position == "")? path: position + "/" + path;
+	}
+	send(toString(json));console.log(toString(json))
+}
+
+function update() {
+	toPath("@");
+}
+
+function back() {
+	var json = {};
+	json.type = "TO_PATH";
+	json.token = getToken();
+	var index = position.lastIndexOf("/");
+	if (index >= 0) {
+		json.path = position.slice(0, index);
+	} else if (position != "") {
+		json.path = "./";
+	}
+	send(toString(json));console.log(toString(json))
+}
+
+function select(file) {
+	var i = selected.indexOf(file);
+	if (i >= 0) {
+		selected.splice(i,1);
+	} else {
+		selected.push(file);
+	}
+	updataSelect();
+}
+
+function updataSelect() {
+	document.getElementById("del").disabled = (selected.length == 0)? true: false;
+	document.getElementById("copyb").disabled = (selected.length == 0)? true: false;
+	document.getElementById("moveb").disabled = (selected.length == 0)? true: false;
+}
+
+function remove() {
+	console.log(selected);
+	var inst = new mdui.dialog({
+	title: '{{delete-file}}(' + selected.length + ")",
+	buttons: [
+		{
+			text: '{{cancel}}'
+		},
+		{
+			text: '{{delete}}',
+			onClick: function(inst){
+			var j = {};
+			j.token = getToken();
+			j.type = "DEL_FILE";
+			j.files = selected;
+			j.path = position;
+			send(toString(j));
+			}
+		}
+	]
+	});
+}
+var instUpload = new mdui.Dialog('#upload');
+var instCreate = new mdui.Dialog('#create');
+document.getElementById('create').addEventListener('confirm.mdui.dialog', function () {
+	var target = document.getElementById('createEdit').value;
+	var j = {};
+		j.token = getToken();
+		j.type = "CREATE_FILE";
+		j.dir = true;
+		j.path = position;
+		j.name = ((position == "")?".":position) + "/" + target;
+		send(toString(j));
+});
+document.getElementById('create').addEventListener('cancel.mdui.dialog', function () {
+	var target = document.getElementById('createEdit').value;
+	var j = {};
+		j.token = getToken();
+		j.type = "CREATE_FILE";
+		j.dir = false;
+		j.path = position;
+		j.name = ((position == "")?".":position) + "/" + target;
+		send(toString(j));
+});
+
+var instCopy = new mdui.Dialog('#copy');
+document.getElementById('copy').addEventListener('confirm.mdui.dialog', function () {
+	var target = document.getElementById('copyEdit').value;
+	var j = {};
+		j.token = getToken();
+		j.type = "COPY_FILE";
+		j.path = position;
+		j.target = target;
+		j.files = selected;
+		send(toString(j));
+});
+
+
+var instMove = new mdui.Dialog('#move');
+document.getElementById('move').addEventListener('confirm.mdui.dialog', function () {
+	var target = document.getElementById('moveEdit').value;
+	var j = {};
+		j.token = getToken();
+		j.type = "MOVE_FILE";
+		j.path = position;
+		j.target = target;
+		j.files = selected;
+		send(toString(j));
+});
+
+var oldName;
+var instRename = new mdui.Dialog('#rename');
+document.getElementById('rename').addEventListener('confirm.mdui.dialog', function () {
+	var newName = document.getElementById('renameEdit').value;
+	if(newName == "") {
+		tips("{{name-not-null}}");
+	} else if (newName != oldName) {
+		var j = {};
+		j.token = getToken();
+		j.type = "RENAME_FILE";
+		j.path = position;
+		j.file = oldName;
+		j.newname = newName;
+		send(toString(j));	
+	}
+});
+function rename(file) {
+	oldName = file;
+	var edit = document.getElementById('renameEdit');
+	edit.value = file;
+	instRename.open();
+	instRename.destroy();
+}
+
+function copy(){
+	document.getElementById('copyEdit').value = position;
+	instCopy.open();
+	instCopy.destroy();
+}
+
+function move(){
+	document.getElementById('moveEdit').value = position;
+	instMove.open();
+	instMove.destroy();
+}
+
+function create(){
+	instCreate.open();
+	instCreate.destroy();
+	document.getElementById('createEdit').value = "";
+}
+
+function edit(file) {
+	var j = {};
+	j.token = getToken();
+	j.type = "READ_FILE";
+	j.file = ((position == "")?".":position) + "/" + file;
+	send(toString(j));
+}
+
+function showEdit(content, file) {
+	document.getElementById('fileEdit').hidden = false;
+	document.getElementById('fileList').hidden = true;
+	document.getElementById('textarea').value = decodeUnicode($.base64.decode(content));
+	document.getElementById("editing").innerText = file;
+	editing = file;
+}
+
+function close() {
+	document.getElementById('fileEdit').hidden = true;
+	document.getElementById('fileList').hidden = false;
+	editing = "";
+}
+
+function decodeUnicode(str) {  
+    str = str.replace(/\\/g, "%");  
+    return unescape(str);  
+}
+
+function encodeUnicode(str){
+　　var ret ="";
+　　for(var i=0; i<str.length; i++){
+       ret += "\\u" + str.charCodeAt(i).toString(16);
+    }
+    return ret;
+}
+
+function save() {
+	var j = {};
+	j.token = getToken();
+	j.type = "SAVE_FILE";
+	j.file = editing;
+	j.content = $.base64.encode(encodeUnicode(document.getElementById('textarea').value));
+	send(toString(j));
+}
+
+function byteConvert(bytes) {
+    if (isNaN(bytes)) {
+        return '';
+    }
+    var symbols = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    var exp = Math.floor(Math.log(bytes)/Math.log(2));
+    if (exp < 1) {
+        exp = 0;
+    }
+    var i = Math.floor(exp / 10);
+    bytes = bytes / Math.pow(2, 10 * i);
+ 
+    if (bytes.toString().length > bytes.toFixed(2).toString().length) {
+        bytes = bytes.toFixed(2);
+    }
+    return bytes + ' ' + symbols[i];
+};
+
+function download(file) {
+	post("../download", {
+		token:getToken(),
+		file:((position == "")?".":position) + "/" + file
+	});
+}
+function post (url,args) {
+    var form = $("<form method='post'></form>");
+	$('body').append(form);
+    form.attr({"action":url});
+    for (arg in args) {
+        var input = $("<input type='hidden'>");
+        input.attr({"name":arg});
+        input.val(args[arg]);
+        form.append(input);
+    }
+    form.submit();
+}
+
+function fileSort1(key){
+	return function(a,b){
+		var c=a[key];
+		var d=b[key];
+		if(c>d){
+			return 1;
+		}else{
+			return -1;
+		}
+	}
+}
+
+function fileSort2(a, b){
+	return b.dir-a.dir;
+}
+
+function dist(json) {
+	var ld = [];
+	var lf = [];
+	var sd = [];
+	var sf = [];
+	for (var i=0;i<json.length;i++) {
+		if (json[i].dir) {
+			ld.push(json[i].name);
+			sd.push(json[i].size);
+		} else {
+			lf.push(json[i].name);
+			sf.push(json[i].size);
+		}
+	}
+	var o = ld.length;
+	ld.concat(lf);
+	sd.concat(sf);
+	var j = {};
+	for (var ii=0;ii<ld.length;ii++) {
+		j[ii].name = ld[ii];
+		j[ii].size = sd[ii];
+		if (o > ii) {
+			j[ii].dir = false;
+		} else {
+			j[ii].dir = true;
+		}
+	}
+	return j;
+}
+
+function upload() {
+	instUpload.open();
+}
+
+function selectFile() {
+var inputElement = document.getElementById("file");
+var file = inputElement.files;
+var reader = new FileReader();
+var md5v;
+//以二进制形式读取文件
+//reader.readAsArrayBuffer(file);
+reader.readAsArrayBuffer(file[0]);
+//文件读取完毕后该函数响应
+reader.onload = function loaded(evt) {
+md5(file[0], 1024).then(e => {
+var j = {};
+console.log("md5=" + e);
+console.log("evt=" + evt.target.result);
+j.token=getToken();
+j.type="FILE_UPLOAD";
+j.path=(position == "")?".":position;
+j.file=file[0].name;
+j.md5=e;
+send(toString(j));
+var binaryString = evt.target.result;
+//发送文件
+send(binaryString);
+instUpload.close();
+});
+}
+}
+
+function md5(file, chunkSize) {
+	return new Promise((resolve, reject) => {
+		let blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice;
+		let chunks = Math.ceil(file.size / chunkSize);
+		let currentChunk = 0;
+		let spark = new SparkMD5.ArrayBuffer();
+		let fileReader = new FileReader();
+	
+		fileReader.onload = function(e) {
+			spark.append(e.target.result); 
+			currentChunk++;
+			if (currentChunk < chunks) {
+				loadNext();
+			} else {
+				let md5 = spark.end();
+				resolve(md5);
+			}
+		};
+	
+		fileReader.onerror = function(e) {
+			reject(e);
+		};
+	
+		function loadNext() {
+			let start = currentChunk * chunkSize;
+			let end = start + chunkSize;
+			if (end > file.size){
+				end = file.size;
+			}
+			fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
+		}
+		loadNext();
+	});
+}
+
+</script>
+</html>

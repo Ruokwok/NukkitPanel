@@ -1,0 +1,7 @@
+name: NukkitPanel
+main: cc.ruok.nukkitpanel.Main
+version: 1.12-release
+api: 1.0.0
+load: STARTUP
+author: Ruok233
+description: 网页控制台面板

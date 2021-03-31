@@ -1,0 +1,53 @@
+<html>
+<head>
+	<meta name="viewport" content="initial-scale=1, user-scalable=0, minimal-ui">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	{{web.src}}
+</head>
+<body class="mdui-color-grey-800">
+<div class="mdui-container">
+  <div class="mdui-row">
+	<div class="mdui-col-xs-12">
+		<div class="mdui-typo" id="console">
+		</div>
+	</div>
+  </div>
+  
+  </div>
+</div>
+</body>
+<script>
+	{{js.websocket}}
+	ws.onopen = function(evt) {
+		var json = {};
+		json.type = "GET_LOG";
+		json.token = getToken();
+		send(toString(json));
+	};
+	
+	ws.onmessage = function(event) {
+		var data = JSON.parse(event.data);
+		var d = document.getElementById('console')
+		for(var key in data.logs){
+			var t = key.split("@")[1];
+			var p1 = document.createElement('font');
+			p1.className = "mdui-m-b-0";
+			p1.size = "1";
+			d.appendChild(p1);
+			
+			var c = document.createElement('code');
+			c.innerText = t;
+			if (t != "") {
+				p1.appendChild(c);
+			}
+			
+			var p = document.createElement('text');
+			p.innerText = ' '+data.logs[key].replace(/\§+[a-z|0-9]/g,"");
+			p1.appendChild(p);
+		}
+		
+		var bodyHeight=$('body').height();
+		$('body,html').animate({scrollTop:bodyHeight},500)
+	}
+</script>
+</html>

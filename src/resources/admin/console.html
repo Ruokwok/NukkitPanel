@@ -1,0 +1,109 @@
+
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1, user-scalable=0, minimal-ui">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    {{web.src}}
+	
+	
+</head>
+<body class="mdui-theme-primary-indigo mdui-drawer-body-left mdui-color-grey-300">
+
+{{web.header}}
+{{web.drawer}}
+
+<div class="mdui-container">
+  <div class="mdui-row">
+  <div class="mdui-card">
+	<div class="mdui-col-xs-12">
+      <iframe src="../log" width=100% height=60%>
+	  </iframe>
+	</div>
+  
+  <div class="mdui-col-xs-12 mdui-col-ms-3 mdui-m-r-3" style="display:flex;flex-wrap:wrap">
+  <div class="mdui-row">
+	<a class="mdui-m-a-1" href="javascript:reload();"><button class="mdui-btn mdui-ripple mdui-color-theme">{{reload}}</button></a>
+	<a class="mdui-m-r-4" href="javascript:stop();"><button class="mdui-btn mdui-ripple mdui-color-theme">{{shutdown}}</button></a>
+  </div>
+  <div class="mdui-col-xs-12 mdui-col-sm-6">
+  <div class="mdui-row" class="mdui-m-l-3">
+	  <div class="mdui-textfield">
+		<input id="cmd" class="mdui-textfield-input" type="text" placeholder="Command"/>
+	  </div>
+  </div>
+  </div>
+  <a href="javascript:enter();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1 mdui-float-right">Enter</button></a>
+  <p class="mdui-typo mdui-text-color-grey">*{{reload-tips}}</p>
+  </div>
+
+</div>
+</div>
+</div>
+</body>
+<script>
+		{{js.websocket}}
+		
+		//建立连接事件
+		ws.onopen = function(evt) {
+			var json = {};
+			json.type = "GET_MAIN";
+			json.token = getToken();
+			send(toString(json));
+		};
+		
+		//消息接收事件
+		ws.onmessage = function(event) {
+			var data = JSON.parse(event.data);
+			if(data.type == "NO_PERMISSION") {
+				gotoPage("login");
+			}
+		};
+		
+		function enter() {
+			var cmd = document.getElementById("cmd").value;
+			document.getElementById("cmd").value = "";
+			var json = {};
+			json.cmd = cmd;
+			json.type = "COMMAND";
+			json.token = getToken();
+			send(toString(json));
+		}
+		
+		function stop() {
+			new mdui.dialog({
+			title: "{{query-shutdown}}",
+			buttons: [
+				{
+					text: '{{cancel}}'
+				},
+				{
+					text: '{{shutdown}}',
+					onClick: function(inst){
+					var j = {};
+					j.token = getToken();
+					j.type = "SHUTDOWN";
+					j.stop = true;
+					send(toString(j));
+					}
+				}
+			]
+			});
+		}
+		
+		function reload() {
+			var j = {};
+			j.token = getToken();
+			j.type = "SHUTDOWN";
+			j.stop = false;
+			send(toString(j));
+		}
+		
+		var input = document.getElementById("cmd");
+		input.addEventListener("keyup", function(event) {
+			event.preventDefault();
+			if (event.keyCode === 13) {
+				enter();
+			}
+		});
+	</script>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <meta name="viewport" content="initial-scale=1, user-scalable=0, minimal-ui">
+	<script src="../res/js/sha256.js"></script>
+    {{web.src}}
+	
+	<script type="text/javascript">
+		{{js.websocket}}
+		
+		//建立连接事件
+		ws.onopen = function(evt) {
+			var json = {};
+			json.type = "AUTH";
+			json.token = getToken();
+			send(toString(json));
+		};
+		
+		
+		//消息接收事件
+		ws.onmessage = function(event) {
+			var data = toJson(event.data);
+			
+			if(data.type == "AUTH") {
+			    if(data.auth) {
+			        setToken(data.token);
+					window.location.href="http://{{e.address}}/admin/main";
+			        gotoPage("main/");
+			    } else {
+			        tips("{{login-err}}");
+			    }
+			}
+			if(data.type == "GOTO") {
+				gotoPage(data.page);
+			}
+		};
+		
+		function onError(event) {
+			alert(event.data);
+		}
+
+
+		
+		
+		function login() {
+			var salt = "{{js.salt}}";
+			var user = document.getElementById("username").value;
+			var pass = document.getElementById("password").value;
+			var json = {};
+			json.key = passEncode(user,pass,salt);
+			json.type = 'LOGIN';
+			send(toString(json));
+		}
+
+	</script>
+</head>
+<body class="mdui-theme-primary-indigo mdui-color-grey-300">
+<header class="mdui-appbar">
+    <div class="mdui-toolbar mdui-color-theme" >
+        <span class="mdui-typo-title">{{login}}</span>
+        <div class="mdui-toolbar-spacer"></div>
+    </div>
+</header>
+
+<div class="mdui-container">
+  <div class="mdui-row">
+      <div class="mdui-card mdui-center mdui-col-xs-12 mdui-col-sm-6" style="margin:5%">
+        <div class="mdui-card-primary">
+          <div style="text-align:center">
+			<img src="../image/icon.png" height="100" width="100"/>
+			<h3>Nukkit Panel</h3>
+			<p>version {{web.version}}</p>
+		  </div>
+			<div class="mdui-textfield mdui-textfield-floating-label">
+				<label class="mdui-textfield-label">{{username}}</label>
+				<input id="username" class="mdui-textfield-input" type="text"/>
+			</div>
+			<div class="mdui-textfield mdui-textfield-floating-label">
+				<label class="mdui-textfield-label">{{password}}</label>
+				<input id="password" class="mdui-textfield-input" type="password"/>
+			</div>
+        </div>
+        <div class="mdui-card-actions">
+          <a href="javascript:login()"><button class="mdui-btn mdui-ripple mdui-float-right mdui-color-theme">{{login}}</button></a>
+        </div>
+      </div>
+  </div>
+</div>
+
+
+
+</body>
+</html>

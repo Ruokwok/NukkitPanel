@@ -1,0 +1,368 @@
+<html>
+<head>
+	<meta name="viewport" content="initial-scale=1, user-scalable=0, minimal-ui">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    {{web.src}}
+</head>
+<body class="mdui-theme-primary-indigo mdui-drawer-body-left mdui-color-grey-300">
+{{web.header}}
+{{web.drawer}}
+
+<div class="mdui-typo">
+<h4 class="mdui-m-a-3">{{online}}<text id="count"></text></h4>
+
+
+<div class="mdui-container">
+ <div class="mdui-row" id="row">
+ </div>
+</div>
+</div>
+<script>
+{{js.websocket}}
+
+		var playerins;
+		var dialog;
+
+		function info(name) {
+			var json = {};
+			json.player = name;
+			json.type = "PLAYER_DETAILS";
+			json.token = getToken();
+			send(toString(json));
+		}
+		
+		function bool2string(b) {
+			if (b) {
+				return "是";
+			}
+			return "否";
+		}
+		
+		function int2os(i) {
+			switch(i) {
+				case 1:
+					return "Android";
+					break;
+				case 2:
+					return "iOS";
+				case 7:
+					return "Windows 10";
+				default:
+					return "{{unknown}}";
+			}
+		}
+		
+		function int2mode(i) {
+			switch(i) {
+				case 0:
+					return "{{gm0}}";
+					break;
+				case 1:
+					return "{{gm1}}";
+					break;
+				case 2:
+					return "{{gm2}}";
+					break;
+				case 3:
+					return "{{gm3}}";
+					break;
+			}
+		}
+		
+		function msg() {
+				dialog.close();
+				mdui.dialog({
+				title: playerins,
+				content:'<div class="mdui-textfield mdui-textfield-floating-label">'+
+						'<label class="mdui-textfield-label">{{msg-content}}</label>'+
+						'<input id="message" class="mdui-textfield-input" type="text"/>'+
+						'</div>',
+				stackedButtons: true,
+				buttons: [
+					{
+					  text: '{{send}} Message',
+					  onClick: function(inst){
+							var m =document.getElementById('message').value;
+							var json = {};
+							json.msg = m;
+							json.player = playerins;
+							json.token = getToken();
+							json.type = "PLAYER_OPER";
+							json.oper = "MESSAGE";
+							send(toString(json));
+					  }
+					},
+					{
+					  text: '{{send}} TiTle',
+					  onClick: function(inst){
+							var m =document.getElementById('message').value;
+							var json = {};
+							json.msg = m;
+							json.player = playerins;
+							json.token = getToken();
+							json.type = "PLAYER_OPER";
+							json.oper = "TITLE";
+							send(toString(json));
+					  }
+					},
+					{
+					  text: '{{send}} SubTitle',
+					  onClick: function(inst){
+							var m =document.getElementById('message').value;
+							var json = {};
+							json.msg = m;
+							json.player = playerins;
+							json.token = getToken();
+							json.type = "PLAYER_OPER";
+							json.oper = "SUBTITLE";
+							send(toString(json));
+					  }
+					},
+					{
+					  text: '{{send}} Tip',
+					  onClick: function(inst){
+							var m =document.getElementById('message').value;
+							var json = {};
+							json.msg = m;
+							json.player = playerins;
+							json.token = getToken();
+							json.type = "PLAYER_OPER";
+							json.oper = "TIPS";
+							send(toString(json));
+					  }
+					},
+					{
+					  text: '{{cancel}}',
+					}
+				  ]
+			});
+		}
+		
+		
+		
+		function op() {
+				dialog.close();
+				mdui.dialog({
+				title: '{{modify-permissions}}:'+playerins,
+				stackedButtons: true,
+				buttons: [
+					{
+					  text: '{{setop}}',
+					  onClick: function(inst){
+							var json = {};
+							json.player = playerins;
+							json.token = getToken();
+							json.type = "PLAYER_OPER";
+							json.oper = "OP";
+							json.bool = true;
+							send(toString(json));
+					  }
+					},
+					{
+					  text: '{{deop}}',
+					  onClick: function(inst){
+							var json = {};
+							json.player = playerins;
+							json.token = getToken();
+							json.type = "PLAYER_OPER";
+							json.oper = "OP";
+							json.bool = false;
+							send(toString(json));
+					  }
+					},
+					{
+					  text: '{{cancel}}',
+					},
+					]
+			});
+		}
+		
+		
+		function kick() {
+				dialog.close();
+				mdui.dialog({
+				title: '{{kick-player}}:'+playerins,
+				buttons: [
+					{
+					  text: '{{confirm}}',
+					  onClick: function(inst){
+							var json = {};
+							json.player = playerins;
+							json.token = getToken();
+							json.type = "PLAYER_OPER";
+							json.oper = "KICK";
+							send(toString(json));
+					  }
+					},
+					{
+					  text: '{{cancel}}',
+					},
+					]
+			});
+		}
+		
+		function mode() {
+				dialog.close();
+				mdui.dialog({
+				title: '{{set-gm}}:'+playerins,
+				stackedButtons: true,
+				buttons: [
+					{
+					  text: '{{gm0}}',
+					  onClick: function(inst){
+							var json = {};
+							json.player = playerins;
+							json.token = getToken();
+							json.type = "PLAYER_OPER";
+							json.oper = "MODE";
+							json.i = 0;
+							send(toString(json));
+					  }
+					},
+					{
+					  text: '{{gm1}}',
+					  onClick: function(inst){
+							var json = {};
+							json.player = playerins;
+							json.token = getToken();
+							json.type = "PLAYER_OPER";
+							json.oper = "MODE";
+							json.i = 1;
+							send(toString(json));
+					  }
+					},
+					{
+					  text: '{{gm2}}',
+					  onClick: function(inst){
+							var json = {};
+							json.player = playerins;
+							json.token = getToken();
+							json.type = "PLAYER_OPER";
+							json.oper = "MODE";
+							json.i = 2;
+							send(toString(json));
+					  }
+					},
+					{
+					  text: '{{gm3}}',
+					  onClick: function(inst){
+							var json = {};
+							json.player = playerins;
+							json.token = getToken();
+							json.type = "PLAYER_OPER";
+							json.oper = "MODE";
+							json.i = 3;
+							send(toString(json));
+					  }
+					},
+					{
+					  text: '{{cancel}}',
+					},
+					]
+			});
+		}
+
+//建立连接事件
+		ws.onopen = function(evt) {
+			var json = {};
+			json.type = "GET_PLAYERS";
+			json.token = getToken();
+			send(toString(json));
+		};
+		
+		ws.onmessage = function(event) {
+			var data = JSON.parse(event.data);
+			if(data.type == "NO_PERMISSION") {
+				gotoPage("login");
+			} else if (data.type == "PLAYER_INFO") {
+				playerins = data.name;
+				console.log(data)
+				dialog = mdui.dialog({
+				title: data.name,
+				content:'<div class="mdui-typo">' +
+						'<p>{{address}}<code>' + data.address + '</code></p>'+
+						'<p>{{hp}}<code>' + data.hp + "</code></p>"+
+						'<p>{{lv}}<code>' + data.lv + "</code></p>"+
+						'<p>{{gm}}<code>' + int2mode(data.mode) + "</code></p>"+
+						'<p>{{op}}<code>' + bool2string(data.op) + "</code></p>"+
+						'<p>{{level}}<code>' + data.level + "</code></p>"+
+						'<p>{{position}}<code>' + data.position + "</code></p>"+
+						'<p>{{device}}<code>' + ((data.device != "")? data.device:"PC") + "</code></p>"+
+						'<p>{{system}}<code>' + int2os(data.deviceOS) + "</code></p>"+
+						'<a href="javascript:msg();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1">发送消息</button></a>'+
+						'<a href="javascript:mode();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1">修改模式</button></a>'+
+						'<a href="javascript:op();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1">设置管理员</button></a>'+
+						'<a href="javascript:kick();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1">踢出</button></a>'+
+						'</div>',
+				buttons: [
+					{
+					  text: '{{cancel}}'
+					},
+				  ]
+				});
+			} else {
+			var row =document.getElementById('row');
+			var count =document.getElementById('count');
+			count.innerText = "(" + data.length + "):";
+			row.innerText = "";
+			for(var i=0;i < data.length;i++){
+				
+				var xs = document.createElement('div');
+				xs.className = "mdui-col-xs-6 mdui-col-sm-3";
+				
+				var card = document.createElement('div');
+				card.className = "mdui-card mdui-p-a-1 mdui-ripple mdui-m-b-1";
+				card.setAttribute("onClick", "info('"+data[i].name+"')");
+				
+				var title = document.createElement('div');
+				title.className = "mdui-typo-title";
+				
+				var xbox = document.createElement('img');
+				xbox.src = "../image/xbox.png";
+				xbox.className = "mdui-p-r-1";
+
+				var name = document.createElement('text');
+				name.innerText = data[i].name;
+				
+				var gm = document.createElement('div');
+				gm.className = "mdui-typo-subheading-opacity";
+				gm.innerText = "{{gm}}";
+				
+				var gmc = document.createElement('code');
+				gmc.innerText = int2mode(data[i].mode);
+				
+				var level = document.createElement('div');
+				level.className = "mdui-typo-subheading-opacity";
+				level.innerText = "{{level}}";
+				
+				var levelc = document.createElement('code');
+				levelc.innerText = data[i].level;
+				
+				var pos = document.createElement('div');
+				pos.className = "mdui-typo-subheading-opacity";
+				pos.innerText = "{{position}}";
+				
+				var posc = document.createElement('code');
+				posc.innerText = data[i].position;
+				
+				
+				row.appendChild(xs);
+				xs.appendChild(card);
+				card.appendChild(title);
+				card.appendChild(gm);
+				card.appendChild(level);
+				card.appendChild(pos);
+				if(data[i].isXbox) {
+					title.appendChild(xbox);
+				}
+				title.appendChild(name);
+				gm.appendChild(gmc);
+				level.appendChild(levelc);
+				pos.appendChild(posc);
+				}
+			}
+		}
+
+</script>
+</body>
+</html>
