@@ -39,14 +39,14 @@ public class API {
     private Map<String, Handler> apis = new HashMap<>();
 
     private API() {
-        registerapis();
+        registerHandlers();
     }
 
     public static API getInstance() {
         return  handler;
     }
 
-    public void registerapis() {
+    public void registerHandlers() {
         apis.put("LOGIN", login());
         apis.put("AUTH", auth());
         apis.put("GET_MAIN", main());
@@ -68,6 +68,10 @@ public class API {
         apis.put("SAVE_FILE", fileSave());
         apis.put("CREATE_FILE", fileCreate());
         apis.put("FILE_UPLOAD", fileUpload());
+    }
+
+    public void registerHandler(String key, Handler handler) {
+        apis.put(key, handler);
     }
 
     public Handler get(String type) {
