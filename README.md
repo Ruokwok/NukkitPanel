@@ -1,17 +1,19 @@
-# Nukkit Panel
-Nukkit Panel旨在打造一款简易高效的服务器管理插件，尽量使用最简便的交互及部署方式。内置HTTP/FTP/WebSocket服务器，你可以用它监控服务器状态、控制台，管理插件、文件、地图等游戏内容。降低小白服主开服门槛。
+## Nukkit Panel
+Nukkit Panel旨在打造一款简易高效的服务器管理插件，尽量使用最简便的交互及部署方式。内置HTTP/FTP/WebSocket服务器，你可以用它监控服务器状态、控制台，管理插件、文件、地图等游戏内容。降低小白服主开服门槛。  
+详细信息请见[MineBBS - Nukkit Panel](https://www.minebbs.com/resources/nukkit-panel.2054/)
 
-# 兼容性
+
+## 兼容性
 Nukkit Panel兼容IE 11+ 和现代主流浏览器(Chrome、Firefox、Edge等)​
 对于服务端，经测试支持NukkitX、PowerNukkit、NukkitPetteriM1Edition核心.
 
-# 进入面板
+## 进入面板
 用浏览器访问http://地址:端口/admin，如 http://127.0.0.1:19132/admin
 
-# 注意事项
+## 注意事项
 请在防火墙放行相应的TCP端口(http、websocket、ftp)
 
-# 配置文件及其默认值
+## 配置文件及其默认值
 plugins/NukkitPanel/config.properties
 ```
 #面板登录的用户名
