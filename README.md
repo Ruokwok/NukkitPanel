@@ -2,6 +2,8 @@
 Nukkit Panel旨在打造一款简易高效的服务器管理插件，尽量使用最简便的交互及部署方式。内置HTTP/FTP/WebSocket服务器，你可以用它监控服务器状态、控制台，管理插件、文件、地图等游戏内容。降低小白服主开服门槛。  
 详细信息请见[MineBBS - Nukkit Panel](https://www.minebbs.com/resources/nukkit-panel.2054/)
 
+## 下载
+MineBBS - [Nukkit Panel Download](https://www.minebbs.com/resources/nukkit-panel.2054/history)
 
 ## 兼容性
 Nukkit Panel兼容IE 11+ 和现代主流浏览器(Chrome、Firefox、Edge等)​
