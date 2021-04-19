@@ -1,8 +1,12 @@
 package cc.ruok.nukkitpanel.modules;
 
+import cc.ruok.nukkitpanel.Main;
 import cc.ruok.nukkitpanel.R;
 import cc.ruok.nukkitpanel.modules.exception.ModuleExecption;
 import cc.ruok.nukkitpanel.modules.exception.ModuleIsExistedExecption;
+import cc.ruok.nukkitpanel.servers.http.PanelHttpServer;
+import cn.nukkit.Server;
+import cn.nukkit.plugin.Plugin;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,7 +18,9 @@ public class ModuleManager {
 
     private List<Module> modules = new ArrayList<>();
 
-    private ModuleManager() {}
+    private ModuleManager() {
+        Server.getInstance().getPluginManager().registerEvents(new ModuleListener(), Main.getInstance());
+    }
 
     public static ModuleManager getInstance() {
         return manager;
@@ -38,6 +44,7 @@ public class ModuleManager {
         modules.add(module);
         try {
             R.load();
+            PanelHttpServer.updateModulePage(module.getId());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -61,6 +68,22 @@ public class ModuleManager {
             d.append(modules.get(i).getDrawerHtml());
         }
         return d.toString();
+    }
+
+    public String[] getModuleList() {
+        String[] arr = new String[modules.size()];
+        for (int i = 0; i < modules.size(); i++) {
+            arr[i] = modules.get(i).getId();
+        }
+        return arr;
+    }
+
+    protected List<Module> getModules() {
+        return modules;
+    }
+
+    protected void remove(Module module) {
+        modules.remove(module);
     }
 
 }
