@@ -11,6 +11,8 @@ import java.util.Map;
 
 public class R {
 
+    public static Map<String, String> lang;
+
     private static String mainPage;
     private static String consolePage;
     private static String pluginsPage;
@@ -27,7 +29,7 @@ public class R {
         filesPage = Format.formatHTML(IOUtils.toString(Main.class.getResource("/resources/admin/files.html"), "utf8"));
         logPage = Format.formatHTML(IOUtils.toString(Main.class.getResource("/resources/admin/log.html"), "utf8"));
         loginPage = Format.formatHTML(IOUtils.toString(Main.class.getResource("/resources/admin/login.html"), "utf8"));
-        Map<String, String> lang = getLanguagePackage();
+        lang = getLanguagePackage();
         for (Map.Entry<String, String> entry : lang.entrySet()) {
             mainPage = mainPage.replaceAll("\\{\\{" + entry.getKey() + "}}", entry.getValue());
             consolePage = consolePage.replaceAll("\\{\\{" + entry.getKey() + "}}", entry.getValue());
