@@ -85,4 +85,12 @@ public class Module {
     public void register() throws ModuleExecption {
         ModuleManager.getInstance().register(this);
     }
+
+    public Plugin getPlugin() {
+        return plugin;
+    }
+
+    public void remove() {
+        ModuleManager.getInstance().remove(this);
+    }
 }
