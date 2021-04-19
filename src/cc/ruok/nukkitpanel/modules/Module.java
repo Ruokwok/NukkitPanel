@@ -4,6 +4,8 @@ import cc.ruok.nukkitpanel.api.API;
 import cc.ruok.nukkitpanel.api.Handler;
 import cc.ruok.nukkitpanel.modules.exception.ModuleExecption;
 import cc.ruok.nukkitpanel.modules.exception.ModuleIsExistedExecption;
+import cn.nukkit.plugin.Plugin;
+import cn.nukkit.plugin.PluginBase;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -21,8 +23,11 @@ public class Module {
 
     private String title = "Module";
 
-    public Module(String id) {
+    private Plugin plugin;
+
+    public Module(String id, PluginBase plugin) {
         this.id = id;
+        this.plugin = plugin;
     }
 
     public String getId() {
