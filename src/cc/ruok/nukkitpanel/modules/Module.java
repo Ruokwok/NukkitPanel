@@ -2,6 +2,8 @@ package cc.ruok.nukkitpanel.modules;
 
 import cc.ruok.nukkitpanel.api.API;
 import cc.ruok.nukkitpanel.api.Handler;
+import cc.ruok.nukkitpanel.modules.exception.ModuleExecption;
+import cc.ruok.nukkitpanel.modules.exception.ModuleIsExistedExecption;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -13,14 +15,18 @@ public class Module {
 
     private String id;
 
-    private String html;
+    private String html = "<h1>This is a module page.</h1>";
 
-    private String icon;
+    private String icon = "extension";
 
-    private String title;
+    private String title = "Module";
 
     public Module(String id) {
         this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public API getAPI() {
@@ -62,5 +68,16 @@ public class Module {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public String getDrawerHtml() {
+        return "<a href=\"../" + id + "\"><li class=\"mdui-list-item mdui-ripple\">\n" +
+                "<i class=\"mdui-list-item-icon mdui-icon material-icons\">" + icon + "</i>\n" +
+                "<div class=\"mdui-list-item-content\">" + title + "</div>\n" +
+                "</li></a>";
+    }
+
+    public void register() throws ModuleExecption {
+        ModuleManager.getInstance().register(this);
     }
 }
