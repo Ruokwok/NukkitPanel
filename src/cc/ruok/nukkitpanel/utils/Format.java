@@ -2,6 +2,7 @@ package cc.ruok.nukkitpanel.utils;
 
 import cc.ruok.nukkitpanel.Config;
 import cc.ruok.nukkitpanel.Main;
+import cc.ruok.nukkitpanel.modules.ModuleManager;
 import cc.ruok.nukkitpanel.servers.websocket.WebSocketServer;
 import org.apache.commons.io.IOUtils;
 
@@ -16,7 +17,8 @@ public class Format {
 
     public static String formatHTML(String html) {
         try {
-            String drawer = IOUtils.toString(Format.class.getResource("/resources/admin/include/drawer.html"), "utf-8");
+            String drawer = IOUtils.toString(Format.class.getResource("/resources/admin/include/drawer.html"), "utf-8")
+                    .replace("{{modules.extension}}", ModuleManager.getInstance().getDrawerHtml());
             String header = IOUtils.toString(Format.class.getResource("/resources/admin/include/header.html"), "utf-8");
             String src = IOUtils.toString(Format.class.getResource("/resources/admin/include/src.html"), "utf-8");
             String ws = IOUtils.toString(Format.class.getResource("/resources/admin/include/websocket.js"), "utf-8");
