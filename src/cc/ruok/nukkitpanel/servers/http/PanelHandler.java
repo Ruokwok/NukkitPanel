@@ -14,7 +14,7 @@ import java.util.Properties;
 
 class PanelHandler {
 
-    private static void format(HttpExchange http) throws IOException {
+    protected static void format(HttpExchange http) throws IOException {
         if (!http.getRequestURI().getPath().endsWith("/")) {
             byte[] bytes = ("<head> <meta http-equiv=\"refresh\" content=\"0;url="+http.getRequestURI().getPath()+"/\"></head>").getBytes();
             http.sendResponseHeaders(200, bytes.length);
