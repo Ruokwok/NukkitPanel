@@ -1,11 +1,16 @@
 package cc.ruok.nukkitpanel.servers.http;
 
 import cc.ruok.nukkitpanel.Config;
+import cc.ruok.nukkitpanel.R;
+import cc.ruok.nukkitpanel.modules.ModuleManager;
+import cc.ruok.nukkitpanel.utils.Format;
 import cn.nukkit.Server;
 import com.sun.net.httpserver.HttpServer;
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Map;
 
 public class PanelHttpServer {
 
@@ -34,6 +39,30 @@ public class PanelHttpServer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void updateModulePage(String mid) {
+        ModuleManager manager = ModuleManager.getInstance();
+        String temp = null;
+        try {
+            temp = IOUtils.toString(PanelHttpServer.class.getResource("/resources/admin/module.html"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String s = Format.formatHTML(temp.replaceAll("\\{\\{module.html}}", manager.getModules(mid).getHTML()));
+        for (Map.Entry<String, String> entry : R.lang.entrySet()) {
+            s = s.replaceAll("\\{\\{" + entry.getKey() + "}}", entry.getValue());
+        }
+        String html = s;
+        int code = 200;
+        getInstance().httpServer.createContext("/admin/" + mid, (http) -> {
+            PanelHandler.format(http);
+            http.getResponseHeaders().add("Content-Type", "text/html; charset=" + Config.getCharset());
+            byte[] bytes = html.getBytes();
+            http.sendResponseHeaders(code, bytes.length);
+            http.getResponseBody().write(bytes);
+            http.close();
+        });
     }
 
     public static PanelHttpServer getInstance() {
