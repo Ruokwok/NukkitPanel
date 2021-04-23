@@ -56,12 +56,19 @@ public class PanelHttpServer {
         String html = s;
         int code = 200;
         getInstance().httpServer.createContext("/admin/" + mid, (http) -> {
-            PanelHandler.format(http);
-            http.getResponseHeaders().add("Content-Type", "text/html; charset=" + Config.getCharset());
-            byte[] bytes = html.getBytes();
-            http.sendResponseHeaders(code, bytes.length);
-            http.getResponseBody().write(bytes);
-            http.close();
+            if (ModuleManager.getInstance().exists(mid)) {
+                PanelHandler.format(http);
+                http.getResponseHeaders().add("Content-Type", "text/html; charset=" + Config.getCharset());
+                byte[] bytes = html.getBytes();
+                http.sendResponseHeaders(code, bytes.length);
+                http.getResponseBody().write(bytes);
+                http.close();
+            } else {
+                byte[] bytes = ("<head> <meta http-equiv=\"refresh\" content=\"0;url=/admin/main/\"></head>").getBytes();
+                http.sendResponseHeaders(200, bytes.length);
+                http.getResponseBody().write(bytes);
+                http.close();
+            }
         });
     }
 
