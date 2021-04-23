@@ -84,6 +84,11 @@ public class ModuleManager {
 
     protected void remove(Module module) {
         modules.remove(module);
+        try {
+            R.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
