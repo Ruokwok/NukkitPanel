@@ -94,6 +94,8 @@ public class Monitor {
                 cpu = Shell.exec("wmic cpu get name","gbk").replace("Name", "").trim();
             } else if (system.contains("Linux")) {
                 cpu = Shell.execLinux("cat /proc/cpuinfo | grep name | cut -f2 -d:").trim();
+            } else if (system.contains("Mac")) {
+                cpu = Shell.exec("sysctl -n machdep.cpu.brand_string", "utf8").trim();
             } else {
                 cpu = "Unknown";
             }
