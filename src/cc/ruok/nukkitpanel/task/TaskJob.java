@@ -1,6 +1,7 @@
 package cc.ruok.nukkitpanel.task;
 
 import cc.ruok.nukkitpanel.Main;
+import cc.ruok.nukkitpanel.R;
 import cn.nukkit.Server;
 import cn.nukkit.command.ConsoleCommandSender;
 import cn.nukkit.scheduler.NukkitRunnable;
@@ -17,13 +18,13 @@ public class TaskJob implements Job {
         int i = Integer.parseInt(jobExecutionContext.getTrigger().getJobKey().getName());
         ArrayList<Task> list = TaskManager.getList().list;
         String[] command = list.get(i).command;
-        Main.getInstance().getLogger().info("执行计划任务: " + list.get(i).title);
+        Main.getInstance().getLogger().info(R.get("execute-task") + ": " + list.get(i).title);
         for (int j = 0; j < command.length; j++) {
             int o = j;
             new NukkitRunnable() {
                 @Override
                 public void run() {
-                    Server.getInstance().dispatchCommand(new ConsoleCommandSender(), command[o]);
+                    Server.getInstance().dispatchCommand(new ConsoleCommandSender(), command[o] );
                 }
             }.runTask(Main.getInstance());
         }
