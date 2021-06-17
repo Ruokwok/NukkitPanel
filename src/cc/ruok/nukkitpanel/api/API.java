@@ -3,10 +3,13 @@ package cc.ruok.nukkitpanel.api;
 import cc.ruok.nukkitpanel.Config;
 import cc.ruok.nukkitpanel.Log;
 import cc.ruok.nukkitpanel.Main;
+import cc.ruok.nukkitpanel.R;
 import cc.ruok.nukkitpanel.api.json.*;
 import cc.ruok.nukkitpanel.file.FileIO;
 import cc.ruok.nukkitpanel.servers.Auth;
 import cc.ruok.nukkitpanel.servers.websocket.WebSocketServer;
+import cc.ruok.nukkitpanel.task.Task;
+import cc.ruok.nukkitpanel.task.TaskManager;
 import cc.ruok.nukkitpanel.utils.Common;
 import cc.ruok.nukkitpanel.utils.Format;
 import cc.ruok.nukkitpanel.utils.Monitor;
@@ -68,6 +71,9 @@ public class API {
         apis.put("SAVE_FILE", fileSave());
         apis.put("CREATE_FILE", fileCreate());
         apis.put("FILE_UPLOAD", fileUpload());
+        apis.put("GET_TASKS", taskList());
+        apis.put("CREATE_TASK", createTask());
+        apis.put("DELETE_TASK", deleteTask());
     }
 
     public void registerHandler(String key, Handler handler) {
@@ -531,6 +537,46 @@ public class API {
             WebSocketServer.upload_md5 = json.md5;
             WebSocketServer.upload_name = json.file;
             WebSocketServer.upload_path = json.path;
+            return null;
+        };
+    }
+
+    private Handler taskList() {
+        return (p,s) -> {
+            GetTasksJson json = gson.fromJson(p, GetTasksJson.class);
+            json.tasks = TaskManager.getList();
+            s.send(json.toString());
+            return null;
+        };
+    }
+
+    private Handler createTask() {
+        return (p,s) -> {
+            TaskCreateJson json = gson.fromJson(p, TaskCreateJson.class);
+            Task task = new Task();
+            task.title = json.title;
+            task.expression = json.cron;
+            task.command = json.command.split("\n");
+            boolean add = TaskManager.add(task);
+            GetTasksJson j = gson.fromJson(p, GetTasksJson.class);
+            j.tasks = TaskManager.getList();
+            s.send(j.toString());
+            if (!add) {
+                s.send(new DialogJson("Cron " + R.get("invalid-expression") + "!").toString());
+            }
+            return null;
+        };
+    }
+
+    private Handler deleteTask() {
+        return (p,s) -> {
+            TaskDeleteJson json = gson.fromJson(p, TaskDeleteJson.class);
+            TaskManager.getList().list.remove(json.key);
+            TaskManager.getList().save();
+            TaskManager.removeJob(String.valueOf(json.key));
+            GetTasksJson j = gson.fromJson(p, GetTasksJson.class);
+            j.tasks = TaskManager.getList();
+            s.send(j.toString());
             return null;
         };
     }
