@@ -32,6 +32,7 @@ public class PanelHttpServer {
             httpServer.createContext("/admin/players", PanelHandler.adminPlayers());
             httpServer.createContext("/admin/files", PanelHandler.adminFiles());
             httpServer.createContext("/admin/download", PanelHandler.download());
+            httpServer.createContext("/admin/task", PanelHandler.adminTask());
             if (Config.onSite()) {
                 httpServer.createContext("/", PanelHandler.website());
             }

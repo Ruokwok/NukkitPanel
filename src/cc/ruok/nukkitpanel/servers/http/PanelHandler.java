@@ -60,6 +60,18 @@ class PanelHandler {
         };
     }
 
+    static HttpHandler adminTask() {
+        return http -> {
+            int code = 200;
+            format(http);
+            http.getResponseHeaders().add("Content-Type", "text/html; charset=" + Config.getCharset());
+            byte[] bytes = R.getTaskPage(http.getLocalAddress()).getBytes();
+            http.sendResponseHeaders(code, bytes.length);
+            http.getResponseBody().write(bytes);
+            http.close();
+        };
+    }
+
     static HttpHandler adminLog() {
         return http -> {
             int code = 200;
