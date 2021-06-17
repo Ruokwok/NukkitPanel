@@ -1,0 +1,171 @@
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1, user-scalable=0, minimal-ui">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    {{web.src}}
+</head>
+<body class="mdui-theme-primary-indigo mdui-drawer-body-left mdui-color-grey-300">
+{{web.header}}
+{{web.drawer}}
+
+
+<div class="mdui-typo">
+    <h4 class="mdui-m-a-3">{{loaded-plugin}}<text id="count"></text></h4>
+</div>
+<div class="mdui-container">
+    <div class="mdui-panel" id="panel" mdui-panel>
+    </div>
+</div>
+</body>
+<script>
+{{js.websocket}}
+
+		function onOper(plugin, oper) {
+			mdui.dialog({
+			title: '{{confirm-operation}}',
+			buttons: [
+				{
+				  text: '{{cancel}}'
+				},
+				{
+				  text: '{{confirm}}',
+				  onClick: function(inst){
+					var j = {};
+					j.token = getToken();
+					j.type = "SWITCH_PLUGIN";
+					j.name = plugin;
+					j.on = oper;
+					send(toString(j));
+				  }
+				}
+			  ]
+			});
+		}
+
+		//建立连接事件
+		ws.onopen = function(evt) {
+			var json = {};
+			json.type = "GET_PLUGINS";
+			json.token = getToken();
+			send(toString(json));
+		};
+
+		ws.onmessage = function(event) {
+			var data = JSON.parse(event.data);
+			if(data.type == "NO_PERMISSION") {
+				gotoPage("login");
+			} else {
+				var panel =document.getElementById('panel');
+				var count =document.getElementById('count');
+				count.innerText = "(" + data.length + "):";
+				for(var i=0;i < data.length;i++){
+					var name = data[i].name;
+					var ver = data[i].ver;
+					var des = data[i].des;
+					var author = data[i].author;
+					var on = data[i].on;
+					var main = data[i].main;
+
+					var item = document.createElement('div');
+					item.className = "mdui-panel-item";
+
+					var head = document.createElement('div');
+					head.className = "mdui-panel-item-header";
+
+					var run = document.createElement('i');
+					if(on) {
+						run.innerText = "pause_circle_filled";
+						run.className = "mdui-icon material-icons mdui-text-color-green";
+					}else{
+						run.className = "mdui-icon material-icons mdui-text-color-red";
+						run.innerText = "play_circle_filled";
+					}
+
+					var title = document.createElement('div');
+					title.className = "mdui-panel-item-title mdui-m-l-3";
+					title.innerText = name;
+
+					var sub = document.createElement('div');
+					sub.className = "mdui-panel-item-summary";
+					sub.innerText = ver;
+
+					var ic = document.createElement('i');
+					ic.className = "mdui-panel-item-arrow mdui-icon material-icons";
+					ic.innerText = "keyboard_arrow_down";
+
+					var body = document.createElement('div');
+					body.className = "mdui-panel-item-body";
+
+					var typo = document.createElement('div');
+					typo.className = "mdui-typo";
+
+					var desp = document.createElement('kbd');
+					desp.innerText = des;
+
+					var authorp = document.createElement('p');
+					authorp.innerText = "{{author}}";
+
+					var authorv = document.createElement('code');
+					authorv.innerText = author;
+
+					var mainp = document.createElement('p');
+					mainp.innerText = "{{main-class}}";
+
+					var mainv = document.createElement('code');
+					mainv.innerText = main;
+
+					var bu = document.createElement('div');
+					bu.className = "mdui-panel-item-actions";
+
+					var ba = document.createElement('a');
+					ba.href = "javascript:onOper('" + name + "',"+((on)?0:1)+")";
+
+					var ra = document.createElement('a');
+					ra.href = "javascript:onOper('" + name + "',2)";
+
+					var button = document.createElement('button');
+					button.className = "mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1";
+					if(on) {
+						button.innerText = "{{disable}}";
+					}else{
+						button.innerText = "{{enable}}";
+					}
+
+					var reload = document.createElement('button');
+					reload.className = "mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1";
+					reload.innerText = "{{reload}}";
+
+
+					item.appendChild(head);
+					item.appendChild(body);
+
+					head.appendChild(run);
+					head.appendChild(title);
+					head.appendChild(sub);
+					head.appendChild(ic);
+
+					body.appendChild(typo);
+					body.appendChild(bu);
+
+					if (des != undefined) {
+						typo.appendChild(desp);
+					}
+					typo.appendChild(authorp);
+					typo.appendChild(mainp);
+
+					if (author != undefined) {
+						authorp.appendChild(authorv);
+					}
+					mainp.appendChild(mainv);
+
+					bu.appendChild(ra);
+					bu.appendChild(ba);
+					ra.appendChild(reload);
+					ba.appendChild(button);
+					panel.appendChild(item);
+				}
+
+			}
+		}
+</script>
+</html>
