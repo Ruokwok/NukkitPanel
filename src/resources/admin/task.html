@@ -10,42 +10,65 @@
 
 
 <div class="mdui-typo">
-    <h4 class="mdui-m-a-3">{{loaded-plugin}}<text id="count"></text></h4>
+    <h4 class="mdui-m-a-3">{{task}}<text id="count"></text></h4>
 </div>
 <div class="mdui-container">
+    <button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-b-1" onClick="create()">{{create-task}}</button>
     <div class="mdui-panel" id="panel" mdui-panel>
     </div>
 </div>
+
+<div class="mdui-dialog" id="create">
+    <div class="mdui-dialog-content">
+        <div class="mdui-typo">
+            <p>{{task-i1}}<a href="https://www.minebbs.com/threads/cron.7043/">常用Cron表达式</a>,{{task-i2}}</p>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">{{task-name}}</label>
+            <input class="mdui-textfield-input" type="text" id="title" placeholder="{{name}}"/>
+            <label class="mdui-textfield-label mdui-m-t-1">Cron{{expression}}</label>
+            <input class="mdui-textfield-input" type="text" id="cron" placeholder="CRON EXPRESSION"/>
+            <label class="mdui-textfield-label mdui-m-t-1">{{command}}({{cmd-line}})</label>
+            <textarea class="mdui-textfield-input" type="text" id="cmd" placeholder="Command..."></textarea>
+        </div>
+    </div>
+    <div class="mdui-dialog-actions">
+        <button class="mdui-btn mdui-ripple" mdui-dialog-cancel>{{cancel}}</button>
+        <button class="mdui-btn mdui-ripple" onClick="createSend()" mdui-dialog-confirm>{{confirm}}</button>
+    </div>
+</div>
+
 </body>
 <script>
 {{js.websocket}}
 
-		function onOper(plugin, oper) {
-			mdui.dialog({
-			title: '{{confirm-operation}}',
-			buttons: [
-				{
-				  text: '{{cancel}}'
-				},
-				{
-				  text: '{{confirm}}',
-				  onClick: function(inst){
-					var j = {};
-					j.token = getToken();
-					j.type = "SWITCH_PLUGIN";
-					j.name = plugin;
-					j.on = oper;
-					send(toString(j));
-				  }
-				}
-			  ]
-			});
+
+		function create() {
+		    document.getElementById('title').value = '';
+		    document.getElementById('cron').value = '0 0 0 * * ? ';
+		    document.getElementById('cmd').value = '';
+			instCreate.open();
+	        //instCreate.destroy();
+		}
+
+		function createSend() {
+		    var json = {};
+			json.type = "CREATE_TASK";
+			json.token = getToken();
+			json.title = document.getElementById('title').value;
+			json.cron = document.getElementById('cron').value;
+			json.command = document.getElementById('cmd').value;
+			if (json.title == "" || json.cron == "" || json.command == "") {
+			    tips("{{no-empty}}!");
+			} else {
+			    send(toString(json));
+			}
 		}
 
 		//建立连接事件
 		ws.onopen = function(evt) {
 			var json = {};
-			json.type = "GET_PLUGINS";
+			json.type = "GET_TASKS";
 			json.token = getToken();
 			send(toString(json));
 		};
@@ -54,17 +77,24 @@
 			var data = JSON.parse(event.data);
 			if(data.type == "NO_PERMISSION") {
 				gotoPage("login");
+			} else if(data.type == "DIALOG") {
+			    mdui.dialog({
+                title: data.message,
+                buttons: [
+                    {
+                      text: '{{confirm}}'
+                    },]
+                });
 			} else {
+			    console.log(data)
 				var panel =document.getElementById('panel');
+				panel.innerText = "";
 				var count =document.getElementById('count');
-				count.innerText = "(" + data.length + "):";
-				for(var i=0;i < data.length;i++){
-					var name = data[i].name;
-					var ver = data[i].ver;
-					var des = data[i].des;
-					var author = data[i].author;
-					var on = data[i].on;
-					var main = data[i].main;
+				count.innerText = "(" + data.tasks.list.length + "):";
+				for(var i=0;i < data.tasks.list.length;i++){
+					var name = data.tasks.list[i].title;
+					var cron = data.tasks.list[i].expression;
+					var command = data.tasks.list[i].command;
 
 					var item = document.createElement('div');
 					item.className = "mdui-panel-item";
@@ -73,13 +103,8 @@
 					head.className = "mdui-panel-item-header";
 
 					var run = document.createElement('i');
-					if(on) {
-						run.innerText = "pause_circle_filled";
-						run.className = "mdui-icon material-icons mdui-text-color-green";
-					}else{
-						run.className = "mdui-icon material-icons mdui-text-color-red";
-						run.innerText = "play_circle_filled";
-					}
+					run.innerText = "alarm_on";
+					run.className = "mdui-icon material-icons mdui-text-color-green";
 
 					var title = document.createElement('div');
 					title.className = "mdui-panel-item-title mdui-m-l-3";
@@ -87,7 +112,7 @@
 
 					var sub = document.createElement('div');
 					sub.className = "mdui-panel-item-summary";
-					sub.innerText = ver;
+					sub.innerText = cron;
 
 					var ic = document.createElement('i');
 					ic.className = "mdui-panel-item-arrow mdui-icon material-icons";
@@ -99,41 +124,18 @@
 					var typo = document.createElement('div');
 					typo.className = "mdui-typo";
 
-					var desp = document.createElement('kbd');
-					desp.innerText = des;
-
-					var authorp = document.createElement('p');
-					authorp.innerText = "{{author}}";
-
-					var authorv = document.createElement('code');
-					authorv.innerText = author;
-
-					var mainp = document.createElement('p');
-					mainp.innerText = "{{main-class}}";
-
-					var mainv = document.createElement('code');
-					mainv.innerText = main;
-
-					var bu = document.createElement('div');
-					bu.className = "mdui-panel-item-actions";
-
-					var ba = document.createElement('a');
-					ba.href = "javascript:onOper('" + name + "',"+((on)?0:1)+")";
-
-					var ra = document.createElement('a');
-					ra.href = "javascript:onOper('" + name + "',2)";
+					for(var j=0;j < data.tasks.list[i].command.length;j++) {
+					    var cmd = document.createElement('kbd');
+					    var cp = document.createElement('p');
+					    cmd.innerText = command[j];
+					    cp.appendChild(cmd);
+					    typo.appendChild(cp);
+					}
 
 					var button = document.createElement('button');
 					button.className = "mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1";
-					if(on) {
-						button.innerText = "{{disable}}";
-					}else{
-						button.innerText = "{{enable}}";
-					}
-
-					var reload = document.createElement('button');
-					reload.className = "mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1";
-					reload.innerText = "{{reload}}";
+					button.innerText = "{{delete}}";
+					button.setAttribute("onclick","deleteTask(" + i + ")");
 
 
 					item.appendChild(head);
@@ -143,29 +145,40 @@
 					head.appendChild(title);
 					head.appendChild(sub);
 					head.appendChild(ic);
-
 					body.appendChild(typo);
-					body.appendChild(bu);
-
-					if (des != undefined) {
-						typo.appendChild(desp);
-					}
-					typo.appendChild(authorp);
-					typo.appendChild(mainp);
-
-					if (author != undefined) {
-						authorp.appendChild(authorv);
-					}
-					mainp.appendChild(mainv);
-
-					bu.appendChild(ra);
-					bu.appendChild(ba);
-					ra.appendChild(reload);
-					ba.appendChild(button);
+					body.appendChild(button);
 					panel.appendChild(item);
 				}
 
 			}
 		}
+
+function deleteTask(i) {
+    open(i)
+}
+
+function open(i) {
+			mdui.dialog({
+			title: '{{confirm-operation}}',
+			buttons: [
+				{
+				  text: '{{cancel}}'
+				},
+				{
+				  text: '{{confirm}}',
+				  onClick: function(inst){
+					var j = {};
+					j.token = getToken();
+					j.type = "DELETE_TASK";
+					j.key = i;
+					send(toString(j));
+					console.log(i)
+				  }
+				}
+			  ]
+			});
+		}
+
+var instCreate = new mdui.Dialog('#create');
 </script>
 </html>
