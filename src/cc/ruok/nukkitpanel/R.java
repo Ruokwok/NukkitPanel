@@ -20,6 +20,7 @@ public class R {
     private static String filesPage;
     private static String logPage;
     private static String loginPage;
+    private static String taskPage;
 
     public static void load() throws IOException {
         mainPage = Format.formatHTML(IOUtils.toString(Main.class.getResource("/resources/admin/index.html"), "utf8"));
@@ -29,6 +30,7 @@ public class R {
         filesPage = Format.formatHTML(IOUtils.toString(Main.class.getResource("/resources/admin/files.html"), "utf8"));
         logPage = Format.formatHTML(IOUtils.toString(Main.class.getResource("/resources/admin/log.html"), "utf8"));
         loginPage = Format.formatHTML(IOUtils.toString(Main.class.getResource("/resources/admin/login.html"), "utf8"));
+        taskPage = Format.formatHTML(IOUtils.toString(Main.class.getResource("/resources/admin/task.html"), "utf8"));
         lang = getLanguagePackage();
         for (Map.Entry<String, String> entry : lang.entrySet()) {
             mainPage = mainPage.replaceAll("\\{\\{" + entry.getKey() + "}}", entry.getValue());
@@ -38,6 +40,7 @@ public class R {
             filesPage = filesPage.replaceAll("\\{\\{" + entry.getKey() + "}}", entry.getValue());
             logPage = logPage.replaceAll("\\{\\{" + entry.getKey() + "}}", entry.getValue());
             loginPage = loginPage.replaceAll("\\{\\{" + entry.getKey() + "}}", entry.getValue());
+            taskPage = taskPage.replaceAll("\\{\\{" + entry.getKey() + "}}", entry.getValue());
         }
     }
 
@@ -94,5 +97,13 @@ public class R {
 
     public static String getLoginPage(InetSocketAddress address) {
         return Format.formatAddress(loginPage, address);
+    }
+
+    public static String getTaskPage(InetSocketAddress address) {
+        return Format.formatAddress(taskPage, address);
+    }
+
+    public static String get(String str) {
+        return lang.get(str);
     }
 }
