@@ -1,7 +1,9 @@
 package cc.ruok.nukkitpanel.api.json;
 
-public class GetTasksJson extends Json{
+import cc.ruok.nukkitpanel.task.TaskList;
 
-    
+public class GetTasksJson extends Json {
+
+    public TaskList tasks;
 
 }
