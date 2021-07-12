@@ -21,7 +21,7 @@ public class ModuleManager {
 
     static {
         supportedList.put("BlocklyNukkit", BlocklyNukkit.class);
-        supportedList.put("EconomyAPI", BlocklyNukkit.class);
+        supportedList.put("EconomyAPI", EconomyAPI.class);
     }
 
     private static ModuleManager manager = new ModuleManager();
