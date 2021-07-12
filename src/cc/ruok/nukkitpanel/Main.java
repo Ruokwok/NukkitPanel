@@ -1,5 +1,6 @@
 package cc.ruok.nukkitpanel;
 
+import cc.ruok.nukkitpanel.modules.ModuleManager;
 import cc.ruok.nukkitpanel.servers.ftp.FTPServer;
 import cc.ruok.nukkitpanel.servers.http.PanelHttpServer;
 import cc.ruok.nukkitpanel.servers.websocket.WebSocketServer;
@@ -40,6 +41,7 @@ public class Main extends PluginBase {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        ModuleManager.getInstance().load();
     }
 
 

@@ -7,23 +7,54 @@ import cc.ruok.nukkitpanel.modules.exception.ModuleIsExistedExecption;
 import cc.ruok.nukkitpanel.servers.http.PanelHttpServer;
 import cn.nukkit.Server;
 import cn.nukkit.plugin.Plugin;
+import cn.nukkit.plugin.PluginManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ModuleManager {
+
+    public static HashMap<String, Class> supportedList = new HashMap<>();
+
+    static {
+        supportedList.put("BlocklyNukkit", BlocklyNukkit.class);
+        supportedList.put("EconomyAPI", BlocklyNukkit.class);
+    }
 
     private static ModuleManager manager = new ModuleManager();
 
     private List<Module> modules = new ArrayList<>();
 
     private ModuleManager() {
-        Server.getInstance().getPluginManager().registerEvents(new ModuleListener(), Main.getInstance());
+        PluginManager pluginManager = Server.getInstance().getPluginManager();
+        pluginManager.registerEvents(new ModuleListener(), Main.getInstance());
     }
 
     public static ModuleManager getInstance() {
         return manager;
+    }
+
+    public void load() {
+        PluginManager pluginManager = Server.getInstance().getPluginManager();
+        Map<String, Plugin> plugins = pluginManager.getPlugins();
+        for (Map.Entry<String, Plugin> entry : plugins.entrySet()) {
+            if (isSupported(entry.getKey())) {
+                Class aClass = supportedList.get(entry.getKey());
+                try {
+                    Module module = (Module) aClass.newInstance();
+                    module.register();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (ModuleExecption moduleExecption) {
+                    moduleExecption.printStackTrace();
+                }
+            }
+        }
     }
 
     public boolean exists(String id) {
@@ -89,6 +120,10 @@ public class ModuleManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isSupported(String plugin) {
+        return supportedList.containsKey(plugin);
     }
 
 }

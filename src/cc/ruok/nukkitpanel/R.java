@@ -44,6 +44,13 @@ public class R {
         }
     }
 
+    public static String format(String html) {
+        for (Map.Entry<String, String> entry : lang.entrySet()) {
+            html = html.replaceAll("\\{\\{" + entry.getKey() + "}}", entry.getValue());
+        }
+        return html;
+    }
+
     public static Map<String, String> getLanguagePackage() {
         String lang = Config.getLang();
         String pkg = "";

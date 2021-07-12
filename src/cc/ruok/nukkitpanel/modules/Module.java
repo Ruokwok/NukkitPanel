@@ -1,11 +1,12 @@
 package cc.ruok.nukkitpanel.modules;
 
+import cc.ruok.nukkitpanel.Config;
+import cc.ruok.nukkitpanel.Main;
 import cc.ruok.nukkitpanel.api.API;
 import cc.ruok.nukkitpanel.api.Handler;
 import cc.ruok.nukkitpanel.modules.exception.ModuleExecption;
-import cc.ruok.nukkitpanel.modules.exception.ModuleIsExistedExecption;
+import cn.nukkit.Server;
 import cn.nukkit.plugin.Plugin;
-import cn.nukkit.plugin.PluginBase;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -25,9 +26,9 @@ public class Module {
 
     private Plugin plugin;
 
-    public Module(String id, PluginBase plugin) {
+    public Module(String id, String plugin) {
         this.id = id;
-        this.plugin = plugin;
+        this.plugin = Server.getInstance().getPluginManager().getPlugin(plugin);
     }
 
     public String getId() {
@@ -56,6 +57,10 @@ public class Module {
 
     public void setHTML(File htmlFile) throws IOException {
         setHTML(new FileInputStream(htmlFile));
+    }
+
+    public void setHTMLofResource(String resource) throws IOException {
+        setHTML(Main.class.getResourceAsStream("/resources/modules/" + resource), Config.getCharset());
     }
 
     public String getHTML() {

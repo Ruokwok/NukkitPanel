@@ -43,18 +43,19 @@ public class PanelHttpServer {
     }
 
     public static void updateModulePage(String mid) {
+//        ModuleManager manager = ModuleManager.getInstance();
+//        String temp = null;
+//        try {
+//            temp = IOUtils.toString(PanelHttpServer.class.getResource("/resources/admin/module.html"));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        String s = Format.formatHTML(temp.replaceAll("\\{\\{module.html}}", manager.getModules(mid).getHTML()));
+//        for (Map.Entry<String, String> entry : R.lang.entrySet()) {
+//            s = s.replaceAll("\\{\\{" + entry.getKey() + "}}", entry.getValue());
+//        }
         ModuleManager manager = ModuleManager.getInstance();
-        String temp = null;
-        try {
-            temp = IOUtils.toString(PanelHttpServer.class.getResource("/resources/admin/module.html"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        String s = Format.formatHTML(temp.replaceAll("\\{\\{module.html}}", manager.getModules(mid).getHTML()));
-        for (Map.Entry<String, String> entry : R.lang.entrySet()) {
-            s = s.replaceAll("\\{\\{" + entry.getKey() + "}}", entry.getValue());
-        }
-        String html = s;
+        String html = R.format(Format.formatHTML(manager.getModules(mid).getHTML()));
         int code = 200;
         getInstance().httpServer.createContext("/admin/" + mid, (http) -> {
             if (ModuleManager.getInstance().exists(mid)) {
