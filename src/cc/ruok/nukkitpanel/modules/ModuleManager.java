@@ -37,22 +37,26 @@ public class ModuleManager {
         return manager;
     }
 
-    public void load() {
+    public void loadAll() {
         PluginManager pluginManager = Server.getInstance().getPluginManager();
         Map<String, Plugin> plugins = pluginManager.getPlugins();
         for (Map.Entry<String, Plugin> entry : plugins.entrySet()) {
-            if (isSupported(entry.getKey())) {
-                Class aClass = supportedList.get(entry.getKey());
-                try {
-                    Module module = (Module) aClass.newInstance();
-                    module.register();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (ModuleExecption moduleExecption) {
-                    moduleExecption.printStackTrace();
-                }
+            load(entry.getKey());
+        }
+    }
+
+    public void load(String plugin) {
+        if (isSupported(plugin)) {
+            Class aClass = supportedList.get(plugin);
+            try {
+                Module module = (Module) aClass.newInstance();
+                module.register();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (ModuleExecption moduleExecption) {
+                moduleExecption.printStackTrace();
             }
         }
     }
