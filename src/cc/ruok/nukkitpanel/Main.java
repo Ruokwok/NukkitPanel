@@ -41,7 +41,7 @@ public class Main extends PluginBase {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        ModuleManager.getInstance().load();
+        ModuleManager.getInstance().loadAll();
     }
 
 
