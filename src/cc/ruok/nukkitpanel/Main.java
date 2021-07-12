@@ -1,6 +1,7 @@
 package cc.ruok.nukkitpanel;
 
 import cc.ruok.nukkitpanel.modules.ModuleManager;
+import cc.ruok.nukkitpanel.servers.Auth;
 import cc.ruok.nukkitpanel.servers.ftp.FTPServer;
 import cc.ruok.nukkitpanel.servers.http.PanelHttpServer;
 import cc.ruok.nukkitpanel.servers.websocket.WebSocketServer;
@@ -39,7 +40,7 @@ public class Main extends PluginBase {
                 ftpServer.start();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
         ModuleManager.getInstance().loadAll();
     }
@@ -47,6 +48,7 @@ public class Main extends PluginBase {
 
     @Override
     public void onDisable() {
+        Auth.getInstance().save();
         panelHttpServer.close();
         if (ftpServer != null) {
             ftpServer.close();
