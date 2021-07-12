@@ -55,12 +55,12 @@ public class PanelHttpServer {
 //            s = s.replaceAll("\\{\\{" + entry.getKey() + "}}", entry.getValue());
 //        }
         ModuleManager manager = ModuleManager.getInstance();
-        String html = R.format(Format.formatHTML(manager.getModules(mid).getHTML()));
         int code = 200;
         getInstance().httpServer.createContext("/admin/" + mid, (http) -> {
             if (ModuleManager.getInstance().exists(mid)) {
                 PanelHandler.format(http);
                 http.getResponseHeaders().add("Content-Type", "text/html; charset=" + Config.getCharset());
+                String html = R.format(Format.formatHTML(manager.getModules(mid).getHTML()));
                 byte[] bytes = html.getBytes();
                 http.sendResponseHeaders(code, bytes.length);
                 http.getResponseBody().write(bytes);
