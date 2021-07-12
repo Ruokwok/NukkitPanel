@@ -51,6 +51,8 @@ public class Main extends PluginBase {
         }
         try {
             webSocket.stop();
+        } catch (NullPointerException e) {
+            // not print
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
