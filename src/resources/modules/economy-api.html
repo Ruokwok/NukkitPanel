@@ -1,0 +1,180 @@
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1, user-scalable=0, minimal-ui">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    {{web.src}}
+
+
+</head>
+<body class="mdui-theme-primary-indigo mdui-drawer-body-left mdui-color-grey-300">
+
+{{web.header}}
+{{web.drawer}}
+
+<div class="mdui-container">
+    <div class="mdui-row">
+        <button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" onClick="update()">{{refresh}}</button>
+        <table class="mdui-table mdui-table-hoverable">
+            <tbody id="list">
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+</body>
+<script>
+		{{js.websocket}}
+
+		//建立连接事件
+		ws.onopen = function(evt) {
+			update();
+		};
+
+		var lister;
+
+		//消息接收事件
+		ws.onmessage = function(event) {
+			var data = JSON.parse(event.data);
+			console.log(data.type)
+			if(data.type == "NO_PERMISSION") {
+				gotoPage("login");
+			} else if(data.type == "TIPS") {
+			    tips(data.message);
+			} else if(data.type == "MD_ECONOMY_LIST"){
+			    console.log(data)
+			    lister = data.list;
+			    var list = document.getElementById('list');
+			    list.innerText = "";
+			    var i = 1;
+			    for(var key in data.list) {
+                    var tr = document.createElement('tr');
+                    var num = document.createElement('td');
+                    var player = document.createElement('td');
+                    var coin = document.createElement('td');
+                    var oper = document.createElement('td');
+
+                    num.innerText = i;
+                    player.innerText = key;
+                    coin.innerText = data.coin + " " + data.list[key];
+                    var edit = document.createElement('i');
+                    edit.innerText = "edit";
+                    edit.className = "mdui-icon material-icons mdui-text-color-orange mdui-ripple";
+                    edit.onclick = function() {
+                        editDia(key);
+                    };
+                    var add = document.createElement('i');
+                    add.innerText = "add";
+                    add.className = "mdui-icon material-icons mdui-text-color-orange mdui-m-l-1 mdui-ripple";
+                    add.onclick = function() {
+                        addDia(key);
+                    };
+                    var remove = document.createElement('i');
+                    remove.innerText = "remove";
+                    remove.className = "mdui-icon material-icons mdui-text-color-orange mdui-m-l-1 mdui-ripple";
+                    remove.onclick = function() {
+                        reduceDia(key);
+                    };
+
+                    list.appendChild(tr);
+                    tr.appendChild(num);
+                    tr.appendChild(player);
+                    tr.appendChild(coin);
+                    tr.appendChild(oper);
+                    oper.appendChild(edit);
+                    oper.appendChild(add);
+                    oper.appendChild(remove);
+                    i++;
+			    }
+			}
+
+		};
+
+		function update() {
+            var json = {};
+			json.type = "MD_ECONOMY_LIST";
+			json.token = getToken();
+			send(toString(json));
+			list.innerText = "Loading...";
+		}
+
+        function editDia(name) {
+			mdui.prompt('{{edit-money}}',
+                function (value) {
+                  if(isFloat(value)) {
+                    var json = {};
+                    json.type = "MD_ECONOMY_EDIT";
+                    json.token = getToken();
+                    json.value = parseFloat(value);
+                    json.player = name;
+                    send(toString(json));
+                  } else {
+                    tips('{{input-error}}');
+                  }
+                },
+                function (value) {
+                  //
+                },
+                {
+                    defaultValue: lister[name],
+                    confirmText: '{{confirm}}',
+                    cancelText: '{{cancel}}',
+                }
+            );
+		}
+
+		function addDia(name) {
+			mdui.prompt('{{edit-money}}',
+                function (value) {
+                  if(isFloat(value)) {
+                    var json = {};
+                    json.type = "MD_ECONOMY_ADD";
+                    json.token = getToken();
+                    json.value = parseFloat(value);
+                    json.player = name;
+                    send(toString(json));
+                  } else {
+                    tips('{{input-error}}');
+                  }
+                },
+                function (value) {
+                  //
+                },
+                {
+                    confirmText: '{{confirm}}',
+                    cancelText: '{{cancel}}',
+                }
+            );
+		}
+
+		function reduceDia(name) {
+			mdui.prompt('{{edit-money}}',
+                function (value) {
+                  if(isFloat(value)) {
+                    var json = {};
+                    json.type = "MD_ECONOMY_REDUCE";
+                    json.token = getToken();
+                    json.value = parseFloat(value);
+                    json.player = name;
+                    send(toString(json));
+                  } else {
+                    tips('{{input-error}}');
+                  }
+                },
+                function (value) {
+                  //
+                },
+                {
+                    confirmText: '{{confirm}}',
+                    cancelText: '{{cancel}}',
+                }
+            );
+		}
+
+		function isFloat(i) {
+		    return parseFloat(i) >= 0;
+		}
+
+
+	</script>
+</html>
