@@ -37,7 +37,8 @@ function quit() {
 }
 
 function tips(str) {
-    var p = {};
-    p.position = "top";
-    mdui.snackbar(str,p);
+//    var p = {};
+//    p.position = "top";
+//    mdui.snackbar(str,p);
+    mdui.alert(str);
 }
