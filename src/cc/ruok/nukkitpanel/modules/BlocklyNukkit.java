@@ -1,7 +1,5 @@
 package cc.ruok.nukkitpanel.modules;
 
-import com.blocklynukkit.loader.Loader;
-
 import java.io.IOException;
 
 public class BlocklyNukkit extends Module {
@@ -14,7 +12,6 @@ public class BlocklyNukkit extends Module {
             e.printStackTrace();
         }
         setTitle("BlocklyNukkit");
-
     }
 
 

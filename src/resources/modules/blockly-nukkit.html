@@ -1,0 +1,39 @@
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1, user-scalable=0, minimal-ui">
+    <meta http-equiv="Content-Type" content="text/html; charset={{web.charset}}">
+    {{web.src}}
+
+
+</head>
+<body class="mdui-theme-primary-indigo mdui-drawer-body-left mdui-color-grey-300">
+
+{{web.header}}
+{{web.drawer}}
+
+<div class="mdui-container">
+    <div class="mdui-row">
+        <h4>对于BlocklyNukkit的适配工作正在进行，请等待后续版本更新。</h4>
+        <h4>The adaptation of BlockyNukkit is in progress, please wait for the subsequent version update.</h4>
+    </div>
+
+</div>
+</body>
+<script>
+		{{js.websocket}}
+
+		//建立连接事件
+		ws.onopen = function(evt) {
+
+		};
+
+		//消息接收事件
+		ws.onmessage = function(event) {
+			var data = JSON.parse(event.data);
+			console.log(data.type)
+			if(data.type == "NO_PERMISSION") {
+				gotoPage("login");
+			}
+		};
+	</script>
+</html>
