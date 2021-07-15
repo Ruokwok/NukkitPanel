@@ -62,14 +62,12 @@ public class ModuleManager {
     }
 
     public boolean exists(String id) {
-        boolean e = false;
         for (int i = 0; i < modules.size(); i++) {
             if (modules.get(i).getId().equals(id)) {
-                e = true;
+                return true;
             }
-            break;
         }
-        return e;
+        return false;
     }
 
     public void register(Module module) throws ModuleExecption {
