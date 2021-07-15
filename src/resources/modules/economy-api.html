@@ -1,7 +1,7 @@
 <html>
 <head>
     <meta name="viewport" content="initial-scale=1, user-scalable=0, minimal-ui">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset={{web.charset}}">
     {{web.src}}
 
 
@@ -124,7 +124,7 @@
 		}
 
 		function addDia(name) {
-			mdui.prompt('{{edit-money}}',
+			mdui.prompt('{{add-money}}',
                 function (value) {
                   if(isFloat(value)) {
                     var json = {};
@@ -148,7 +148,7 @@
 		}
 
 		function reduceDia(name) {
-			mdui.prompt('{{edit-money}}',
+			mdui.prompt('{{reduce-money}}',
                 function (value) {
                   if(isFloat(value)) {
                     var json = {};

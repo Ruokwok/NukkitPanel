@@ -30,7 +30,8 @@ public class Format {
                     .replaceAll("\\{\\{web.mdui.js}}", Config.getMduiJs())
                     .replaceAll("\\{\\{js.websocket}}", Matcher.quoteReplacement(ws)))
                     .replaceAll("\\{\\{ws.port}}", String.valueOf(WebSocketServer.port()))
-                    .replaceAll("\\{\\{web.version}}", Main.getInstance().getDescription().getVersion());
+                    .replaceAll("\\{\\{web.version}}", Main.getInstance().getDescription().getVersion())
+                    .replaceAll("\\{\\{web.charset}}", Config.getCharset());
         } catch (IOException e) {
             e.printStackTrace();
             return html;
