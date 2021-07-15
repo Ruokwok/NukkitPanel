@@ -104,3 +104,5 @@ add-money=新增玩家餘額
 reduce-money=减少玩家餘額
 input-error=你的輸入有誤
 success=成功
+login-success=登入面板成功。密碼正確。
+login-fail=嘗試登入面板。用戶名或密碼錯誤！已封锁！

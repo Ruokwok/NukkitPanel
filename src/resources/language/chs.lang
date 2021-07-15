@@ -104,3 +104,5 @@ add-money=增加玩家余额
 reduce-money=减少玩家余额
 input-error=你的输入有误
 success=成功
+login-success=登录面板。密码正确，发放令牌。
+login-fail=尝试登录面板。用户名或密码错误！已阻止！
