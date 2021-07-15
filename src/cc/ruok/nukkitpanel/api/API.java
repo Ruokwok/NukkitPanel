@@ -22,6 +22,7 @@ import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.plugin.PluginManager;
 import cn.nukkit.scheduler.NukkitRunnable;
+import cn.nukkit.utils.Logger;
 import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 
@@ -41,8 +42,11 @@ public class API {
 
     private Map<String, Handler> apis = new HashMap<>();
 
+    private Logger logger;
+
     private API() {
         registerHandlers();
+        logger = Main.getInstance().getLogger();
     }
 
     public static API getInstance() {
@@ -104,9 +108,11 @@ public class API {
                     e.printStackTrace();
                 }
                 aj.message = "welcome";
+                logger.info(s.getRemoteSocketAddress() + R.get("login-success"));
             } else {
                 aj.auth = false;
                 aj.message = "password error";
+                logger.info(s.getRemoteSocketAddress() + R.get("login-fail"));
             }
             try {
                 s.send(aj.toString());
