@@ -16,20 +16,40 @@ public class Monitor {
     private static String cpu;
 
     static double getLoad() {
-//        return osBean.getProcessCpuLoad();
-        try {
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            ObjectName name = ObjectName.getInstance("java.lang:type=OperatingSystem");
-            AttributeList list = null;
-            list = mbs.getAttributes(name, new String[]{"ProcessCpuLoad"});
-            if (list.isEmpty()) return Double.NaN;
-            Attribute att = (Attribute) list.get(0);
-            Double value = (Double) att.getValue();
-            if (value == -1.0) return Double.NaN;
-            return ((int) (value * 1000) / 10.0);
-        } catch (Exception e) {
-            return -1.0D;
+////        return osBean.getProcessCpuLoad();
+//        try {
+//            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+//            ObjectName name = ObjectName.getInstance("java.lang:type=OperatingSystem");
+//            AttributeList list = null;
+//            list = mbs.getAttributes(name, new String[]{"ProcessCpuLoad"});
+//            if (list.isEmpty()) return Double.NaN;
+//            Attribute att = (Attribute) list.get(0);
+//            Double value = (Double) att.getValue();
+//            if (value == -1.0) return Double.NaN;
+//            return ((int) (value * 1000) / 10.0);
+//        } catch (Exception e) {
+//            return -1.0D;
+//        }
+        double load = -1.0D;
+        java.lang.management.OperatingSystemMXBean osMxBean = ManagementFactory.getOperatingSystemMXBean();
+        load = osMxBean.getSystemLoadAverage();
+        com.sun.management.OperatingSystemMXBean osMxBean4;
+        if (load == -1.0D) {
+            osMxBean4 = (com.sun.management.OperatingSystemMXBean)ManagementFactory.getOperatingSystemMXBean();
+            load = osMxBean4.getSystemCpuLoad();
         }
+
+        if (load == -1.0D) {
+            osMxBean4 = (com.sun.management.OperatingSystemMXBean)ManagementFactory.getOperatingSystemMXBean();
+            load = osMxBean4.getProcessCpuLoad();
+        }
+
+        if (load == -1.0D) {
+            osMxBean4 = (com.sun.management.OperatingSystemMXBean)ManagementFactory.getOperatingSystemMXBean();
+            load = osMxBean4.getSystemLoadAverage();
+        }
+
+        return load;
     }
 
     public static double getOSMenRound() {
