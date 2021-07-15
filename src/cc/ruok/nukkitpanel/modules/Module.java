@@ -60,7 +60,7 @@ public class Module {
     }
 
     public void setHTMLofResource(String resource) throws IOException {
-        setHTML(Main.class.getResourceAsStream("/resources/modules/" + resource), Config.getCharset());
+        setHTML(Main.class.getResourceAsStream("/resources/modules/" + resource), "utf8");
     }
 
     public String getHTML() {
