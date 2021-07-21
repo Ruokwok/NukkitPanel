@@ -1,6 +1,6 @@
 name: NukkitPanel
 main: cc.ruok.nukkitpanel.Main
-version: 1.15-release
+version: 1.15.1-release
 api: 1.0.0
 load: STARTUP
 author: Ruok233
