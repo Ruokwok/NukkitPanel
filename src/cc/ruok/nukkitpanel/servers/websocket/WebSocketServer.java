@@ -94,6 +94,11 @@ public class WebSocketServer extends org.java_websocket.server.WebSocketServer {
         e.printStackTrace();
     }
 
+    @Override
+    public void onStart() {
+
+    }
+
     public static int port() {
         return port;
     }
