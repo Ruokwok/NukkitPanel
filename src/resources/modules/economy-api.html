@@ -60,21 +60,15 @@
                     var edit = document.createElement('i');
                     edit.innerText = "edit";
                     edit.className = "mdui-icon material-icons mdui-text-color-orange mdui-ripple";
-                    edit.onclick = function() {
-                        editDia(key);
-                    };
+                    edit.onclick = Function("editDia('"+key+"')");
                     var add = document.createElement('i');
                     add.innerText = "add";
                     add.className = "mdui-icon material-icons mdui-text-color-orange mdui-m-l-1 mdui-ripple";
-                    add.onclick = function() {
-                        addDia(key);
-                    };
+                    add.onclick = Function("addDia('"+key+"')");
                     var remove = document.createElement('i');
                     remove.innerText = "remove";
                     remove.className = "mdui-icon material-icons mdui-text-color-orange mdui-m-l-1 mdui-ripple";
-                    remove.onclick = function() {
-                        reduceDia(key);
-                    };
+                    remove.onclick = Function("reduceDia('"+key+"')");
 
                     list.appendChild(tr);
                     tr.appendChild(num);
