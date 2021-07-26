@@ -62,16 +62,19 @@
                     stats.className = lister[key]?"mdui-text-color-green":"mdui-text-color-red";
                     var del = document.createElement('i');
                     del.className = "mdui-icon material-icons mdui-text-color-orange mdui-m-l-1 mdui-ripple";
+                    $(del).attr("mdui-tooltip", "{content: '{{delete}}'}")
                     del.innerText = "delete";
                     del.onclick = Function("del('"+key+"')");
                     var up = document.createElement('i')
                     up.innerText = "file_upload";
                     up.className = "mdui-icon material-icons mdui-text-color-orange mdui-m-l-1 mdui-ripple";
                     up.onclick = Function("bn_cmd('"+key+"', 'update')");
+                    $(up).attr("mdui-tooltip", "{content: '{{update}}'}")
                     var load = document.createElement('i');
                     load.innerText = "refresh";
                     load.className = "mdui-icon material-icons mdui-text-color-orange mdui-ripple";
                     load.onclick = Function("bn_cmd('"+key+"', 'load')");
+                    $(load).attr("mdui-tooltip", "{content: '{{reload}}'}")
 
 			        list.appendChild(tr);
 			        tr.appendChild(plugin);

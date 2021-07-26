@@ -61,14 +61,17 @@
                     edit.innerText = "edit";
                     edit.className = "mdui-icon material-icons mdui-text-color-orange mdui-ripple";
                     edit.onclick = Function("editDia('"+key+"')");
+                    $(edit).attr("mdui-tooltip", "{content: '{{edit-money}}'}")
                     var add = document.createElement('i');
                     add.innerText = "add";
                     add.className = "mdui-icon material-icons mdui-text-color-orange mdui-m-l-1 mdui-ripple";
                     add.onclick = Function("addDia('"+key+"')");
+                    $(add).attr("mdui-tooltip", "{content: '{{add-money}}'}")
                     var remove = document.createElement('i');
                     remove.innerText = "remove";
                     remove.className = "mdui-icon material-icons mdui-text-color-orange mdui-m-l-1 mdui-ripple";
                     remove.onclick = Function("reduceDia('"+key+"')");
+                    $(remove).attr("mdui-tooltip", "{content: '{{reduce-money}}'}")
 
                     list.appendChild(tr);
                     tr.appendChild(num);
