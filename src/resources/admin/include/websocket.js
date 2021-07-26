@@ -48,3 +48,12 @@ function bar(str) {
     p.position = "top";
     mdui.snackbar(str,p);
 }
+
+function endsWith(str, target) {
+    var start = str.length-target.length;
+    var arr = str.substr(start,target.length);
+    if(arr == target){
+        return true;
+    }
+    return false;
+}
