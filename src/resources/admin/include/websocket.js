@@ -42,3 +42,9 @@ function tips(str) {
 //    mdui.snackbar(str,p);
     mdui.alert(str);
 }
+
+function bar(str) {
+    var p = {};
+    p.position = "top";
+    mdui.snackbar(str,p);
+}
