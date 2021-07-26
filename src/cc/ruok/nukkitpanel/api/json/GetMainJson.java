@@ -1,5 +1,7 @@
 package cc.ruok.nukkitpanel.api.json;
 
+import java.util.ArrayList;
+
 public class GetMainJson extends GetJson {
 
     public GetMainJson() {
@@ -43,5 +45,19 @@ public class GetMainJson extends GetJson {
     public String motd;     //MOTD;
 
     public String nukkit;   //内核名称
+
+    public ArrayList<Level> level = new ArrayList<>();
+
+    public static class Level {
+
+        public String name;
+
+        public int chunks;
+
+        public int entity;
+
+        public int player;
+
+    }
 
 }

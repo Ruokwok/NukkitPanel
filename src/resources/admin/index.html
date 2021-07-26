@@ -65,6 +65,16 @@
 	</div>
 
 	<div class="mdui-col-sx-12 mdui-col-lg-6">
+		<div class="mdui-card" style="margin:1%;padding:1">
+			<div class="mdui-typo">
+				<table class="mdui-table mdui-table-hoverable">
+					<tbody id="level">
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="mdui-col-sx-12 mdui-col-lg-6">
       <div class="mdui-card" style="margin:1%;padding:3%">
 			<div class="mdui-typo">
 				<p><kbd>{{os-info}}</kbd></p>
@@ -128,7 +138,7 @@
 		//消息接收事件
 		ws.onmessage = function(event) {
 			var data = JSON.parse(event.data);
-			console.log(data.type)
+		//	console.log(data)
 			if(data.type == "NO_PERMISSION") {
 				gotoPage("login");
 			}
@@ -182,6 +192,38 @@
 						circle.text(pol + "/" + pmax);
 					}
 				});
+				var list = document.getElementById('level');
+				list.innerText = "";
+				var tr = document.createElement('tr');
+				var name = document.createElement('td');
+				var chunks = document.createElement('td');
+				var entity = document.createElement('td');
+				var player = document.createElement('td');
+				name.innerText = "{{level-name}}";
+				chunks.innerText = "{{level-chunks}}";
+				entity.innerText = "{{level-entity}}";
+				player.innerText = "{{level-player}}";
+				list.appendChild(tr);
+				tr.appendChild(name);
+				tr.appendChild(chunks);
+				tr.appendChild(entity);
+				tr.appendChild(player);
+				for (var i = 0; i < data.level.length; i++) {
+					var tr = document.createElement('tr');
+					var name = document.createElement('td');
+					var chunks = document.createElement('td');
+					var entity = document.createElement('td');
+					var player = document.createElement('td');
+					name.innerText = data.level[i]["name"];
+					chunks.innerText = data.level[i]["chunks"];
+					entity.innerText = data.level[i]["entity"];
+					player.innerText = data.level[i]["player"];
+					list.appendChild(tr);
+					tr.appendChild(name);
+					tr.appendChild(chunks);
+					tr.appendChild(entity);
+					tr.appendChild(player);
+				}
 			}
 		};	
 	</script>

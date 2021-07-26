@@ -17,6 +17,7 @@ import cn.nukkit.Nukkit;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.command.ConsoleCommandSender;
+import cn.nukkit.level.Level;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.plugin.Plugin;
@@ -181,6 +182,15 @@ public class API {
                         j.nukkit = nk.contains("Nukkit")? nk: server.getName();
                         long time = System.currentTimeMillis() - Nukkit.START_TIME;
                         j.runtime = Format.formatUptime(time);
+                        Map<Integer, Level> levels = server.getLevels();
+                        for (Map.Entry<Integer, Level> entry : levels.entrySet()) {
+                            GetMainJson.Level level = new GetMainJson.Level();
+                            level.name = entry.getValue().getFolderName();
+                            level.chunks = entry.getValue().getChunks().size();
+                            level.entity = entry.getValue().getEntities().length;
+                            level.player = entry.getValue().getPlayers().size();
+                            j.level.add(level);
+                        }
                         s.send(j.toString());
                         Thread.sleep(5000);
                     } catch (Exception e) {
