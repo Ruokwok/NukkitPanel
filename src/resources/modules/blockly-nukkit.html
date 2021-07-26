@@ -13,8 +13,12 @@
 
 <div class="mdui-container">
     <div class="mdui-row">
-        <h4>对于BlocklyNukkit的适配工作正在进行，请等待后续版本更新。</h4>
-        <h4>The adaptation of BlockyNukkit is in progress, please wait for the subsequent version update.</h4>
+        <button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" onClick="install()">{{bnpm-install}}</button>
+        <button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" onClick="update()">{{refresh}}</button>
+        <table class="mdui-table mdui-table-hoverable mdui-typo">
+            <tbody id="list">
+            </tbody>
+        </table>
     </div>
 
 </div>
@@ -24,16 +28,119 @@
 
 		//建立连接事件
 		ws.onopen = function(evt) {
-
+            update();
 		};
 
 		//消息接收事件
 		ws.onmessage = function(event) {
 			var data = JSON.parse(event.data);
-			console.log(data.type)
+			//console.log(data)
 			if(data.type == "NO_PERMISSION") {
 				gotoPage("login");
+			} else if (data.type == "TIPS") {
+			    if (endsWith(data.message, "...")) {
+			        bar(data.message);
+			        update();
+			    } else {
+			        tips(data.message);
+			    }
+			} else if (data.type == "MD_BN_LIST") {
+			    var list = document.getElementById('list');
+			    list.innerText = "";
+			    lister = data.list;
+			    for(var key in data.list) {
+			        var tr = document.createElement('tr');
+                    var plugin = document.createElement('td');
+                    var bnp = document.createElement('kbd');
+                    var stats = document.createElement('td');
+                    var oper = document.createElement('td');
+
+                    plugin.innerText = key;
+                    bnp.innerText = "BNPM";
+                    bnp.className = "mdui-m-l-1";
+                    stats.innerText = lister[key]?"{{enabled}}":"{{disabled}}";
+                    stats.className = lister[key]?"mdui-text-color-green":"mdui-text-color-red";
+                    var del = document.createElement('i');
+                    del.className = "mdui-icon material-icons mdui-text-color-orange mdui-m-l-1 mdui-ripple";
+                    del.innerText = "delete";
+                    del.onclick = Function("del('"+key+"')");
+                    var up = document.createElement('i')
+                    up.innerText = "file_upload";
+                    up.className = "mdui-icon material-icons mdui-text-color-orange mdui-m-l-1 mdui-ripple";
+                    up.onclick = Function("bn_cmd('"+key+"', 'update')");
+                    var load = document.createElement('i');
+                    load.innerText = "refresh";
+                    load.className = "mdui-icon material-icons mdui-text-color-orange mdui-ripple";
+                    load.onclick = Function("bn_cmd('"+key+"', 'load')");
+
+			        list.appendChild(tr);
+			        tr.appendChild(plugin);
+			        if (lister[key]["bnpm"]) {
+                        plugin.appendChild(bnp);
+                    }
+                    tr.appendChild(stats);
+                    tr.appendChild(oper);
+                    oper.appendChild(load);
+                    if (lister[key]["bnpm"]) {
+                        oper.appendChild(up);
+                        oper.appendChild(del);
+                    }
+			    }
 			}
 		};
+
+		function update() {
+		    var json = {};
+            json.type = "MD_BN_LIST";
+            json.token = getToken();
+            send(toString(json));
+		}
+
+		function install() {
+		    mdui.prompt('{{bn-plugin-name}}',
+                function (value) {
+                  if(value != "") {
+                    bn_cmd(value, "install");
+                  } else {
+                    tips('{{input-error}}');
+                  }
+                },
+                function (value) {
+                  //
+                },
+                {
+                    confirmText: '{{install}}',
+                    cancelText: '{{cancel}}',
+                }
+            );
+		}
+
+		function bn_cmd(plugin, param) {
+		    var json = {};
+            json.type = "MD_BN_CMD";
+            json.token = getToken();
+            json.plugin = plugin;
+            json.param = param;
+            send(toString(json));
+            setTimeout("update()","1000");
+		}
+
+		function del(plugin) {
+            mdui.dialog({
+              title: plugin,
+              content: '{{del-bn-plugin}}',
+              buttons: [
+                {
+                  text: '{{cancel}}'
+                },
+                {
+                  text: '{{confirm}}',
+                  onClick: function(inst){
+                     bn_cmd(plugin, "delete");
+                  }
+                }
+              ]
+            });
+        }
 	</script>
 </html>
