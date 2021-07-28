@@ -37,10 +37,11 @@ public class BlocklyNukkit extends Module {
             if (files[i].endsWith(".js") ||
                     files[i].endsWith(".php") ||
                     files[i].endsWith(".lua") ||
+                    files[i].endsWith(".bnpx") ||
                     files[i].endsWith(".py")) {
                 BNPluginsListJson.BNP bnp = new BNPluginsListJson.BNP();
                 bnp.stats = set.contains(files[i]);
-                bnp.bnpm = Arrays.asList(bnpms).contains(files[i].replaceAll("\\.(php|js|lua|py)",".yml"));
+                bnp.bnpm = Arrays.asList(bnpms).contains(files[i].replaceAll("\\.(php|js|lua|py|bnpx)",".yml"));
                 json.list.put(files[i], bnp);
             }
         }
@@ -56,7 +57,7 @@ public class BlocklyNukkit extends Module {
         } else if (j.param.equals("update")) {
             cmd = "bnpm update " + j.plugin;
         } else if (j.param.equals("delete")) {
-            cmd = "bnpm delete " + j.plugin.replaceAll("\\.(php|js|lua|py)", "");
+            cmd = "bnpm delete " + j.plugin.replaceAll("\\.(php|js|lua|py|bnpx)", "");
         } else if (j.param.equals("install")) {
             cmd = "bnpm install " + j.plugin;
         }
