@@ -7,6 +7,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.URL;
 import java.util.Map;
 
 public class R {
@@ -54,14 +55,19 @@ public class R {
     public static Map<String, String> getLanguagePackage() {
         String lang = Config.getLang();
         String pkg = "";
+        URL url = Main.class.getResource("/resources/language/" + Server.getInstance().getLanguage().getLang() + ".lang");
         if (lang.equals("auto")) {
-            try {
-                pkg = IOUtils.toString(Main.class.getResource("/resources/language/" + Server.getInstance().getLanguage().getLang() + ".lang"), "utf8");
-            } catch (IOException e) {
+            if (url == null) {
                 try {
                     pkg = IOUtils.toString(Main.class.getResource("/resources/language/chs.lang"), "utf8");
-                } catch (IOException ex) {
-                    ex.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    pkg = IOUtils.toString(url, "utf8");
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         } else {
