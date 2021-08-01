@@ -59,7 +59,7 @@ public class R {
         if (lang.equals("auto")) {
             if (url == null) {
                 try {
-                    pkg = IOUtils.toString(Main.class.getResource("/resources/language/chs.lang"), "utf8");
+                    pkg = IOUtils.toString(Main.class.getResource("/resources/language/eng.lang"), "utf8");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -75,7 +75,7 @@ public class R {
                 pkg = IOUtils.toString(Main.class.getResource("/resources/language/" + Config.getLang() + ".lang"), "utf8");
             } catch (IOException e) {
                     try {
-                        pkg = IOUtils.toString(Main.class.getResource("/resources/language/chs.lang"), "utf8");
+                        pkg = IOUtils.toString(Main.class.getResource("/resources/language/eng.lang"), "utf8");
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
