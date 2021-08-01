@@ -41,7 +41,7 @@ public class BlocklyNukkit extends Module {
                     files[i].endsWith(".py")) {
                 BNPluginsListJson.BNP bnp = new BNPluginsListJson.BNP();
                 bnp.stats = set.contains(files[i]);
-                bnp.bnpm = Arrays.asList(bnpms).contains(files[i].replaceAll("\\.(php|js|lua|py|bnpx)",".yml"));
+                bnp.bnpm = bnpms != null && Arrays.asList(bnpms).contains(files[i].replaceAll("\\.(php|js|lua|py|bnpx)", ".yml"));
                 json.list.put(files[i], bnp);
             }
         }
