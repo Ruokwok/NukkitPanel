@@ -1,10 +1,10 @@
 package cc.ruok.nukkitpanel.api.json;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 
 public class LogJson extends Json {
 
-    public LinkedHashMap<String, String> logs;
+    public ArrayList<String> logs;
 
     public String time;
 
