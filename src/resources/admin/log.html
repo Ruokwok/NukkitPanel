@@ -13,15 +13,26 @@
 <script>
 	{{js.websocket}}
 
+	var bw = document.body.clientWidth;
+	var bh = document.body.clientHeight;
+	var size;
+	if(bw/bh < 1.1) {
+		size = 10;
+	} else {
+		size = 15;
+	}
+
 	var term = new Terminal({
 		rendererType:"canvas",
 		disableStdin:true,
 		cursorBlink:false,
-		rows: 160,
+		columns: 160,
+		fontSize: size,
 	});
     term.open(document.getElementById('console'));
     Terminal.applyAddon(fit);
     term.fit();
+    term.columns = 160;
 
 	ws.onopen = function(evt) {
 		var json = {};
