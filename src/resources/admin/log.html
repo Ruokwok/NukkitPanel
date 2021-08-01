@@ -3,21 +3,27 @@
 	<meta name="viewport" content="initial-scale=1, user-scalable=0, minimal-ui">
 	<meta http-equiv="Content-Type" content="text/html; charset={{web.charset}}">
 	{{web.src}}
+	<script src="https://cdn.bootcdn.net/ajax/libs/xterm/3.9.2/xterm.min.js"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/xterm/3.9.2/addons/fit/fit.min.js"></script>
+	<link href="https://cdn.bootcdn.net/ajax/libs/xterm/3.9.2/xterm.min.css" rel="stylesheet">
 </head>
 <body class="mdui-color-grey-800">
-<div class="mdui-container">
-  <div class="mdui-row">
-	<div class="mdui-col-xs-12">
-		<div class="mdui-typo" id="console">
-		</div>
-	</div>
-  </div>
-  
-  </div>
-</div>
+<div id="console" style="width:100%;height:100%;"></div>
 </body>
 <script>
 	{{js.websocket}}
+
+	var term = new Terminal({
+		rendererType:"canvas",
+		disableStdin:true,
+		cursorBlink:false,
+		rows: 160,
+	});
+    term.open(document.getElementById('console'));
+    Terminal.applyAddon(fit);
+    term.fit();
+    term.writeln('Hello from \x1B[1;38mxterm.js \x1B[0m ')
+
 	ws.onopen = function(evt) {
 		var json = {};
 		json.type = "GET_LOG";
@@ -27,27 +33,28 @@
 	
 	ws.onmessage = function(event) {
 		var data = JSON.parse(event.data);
-		var d = document.getElementById('console')
-		for(var key in data.logs){
-			var t = key.split("@")[1];
-			var p1 = document.createElement('font');
-			p1.className = "mdui-m-b-0";
-			p1.size = "1";
-			d.appendChild(p1);
-			
-			var c = document.createElement('code');
-			c.innerText = t;
-			if (t != "") {
-				p1.appendChild(c);
-			}
-			
-			var p = document.createElement('text');
-			p.innerText = ' '+data.logs[key].replace(/\§+[a-z|0-9]/g,"");
-			p1.appendChild(p);
+		for(var i = 0; i < data.logs.length; i++){
+		//console.log(data.logs[i])
+			term.writeln(
+				data.logs[i]
+				.replace(/§1/g, "\x1B[1;34m")
+				.replace(/§2/g, "\x1B[1;32m")
+				.replace(/§3/g, "\x1B[1;36m")
+				.replace(/§4/g, "\x1B[1;31m")
+				.replace(/§5/g, "\x1B[1;35m")
+				.replace(/§6/g, "\x1B[1;33m")
+				.replace(/§7/g, "\x1B[1;37m")
+				.replace(/§8/g, "\x1B[1;30m")
+				.replace(/§9/g, "\x1B[1;34m")
+				.replace(/§0/g, "\x1B[1;30m")
+				.replace(/§a/g, "\x1B[1;32m")
+				.replace(/§b/g, "\x1B[1;36m")
+				.replace(/§c/g, "\x1B[1;31m")
+				.replace(/§d/g, "\x1B[1;35m")
+				.replace(/§e/g, "\x1B[1;33m")
+				.replace(/§f/g, "\x1B[1;37m")
+			+ "\x1B[0m");
 		}
-		
-		var bodyHeight=$('body').height();
-		$('body,html').animate({scrollTop:bodyHeight},500)
 	}
 </script>
 </html>

@@ -207,11 +207,11 @@ public class API {
             new Thread(() -> {
                 Log log = new Log();
                 LogJson j = new LogJson();
-                j.logs = log.getLogToMap();
+                j.logs = log.getLogToList();
                 s.send(j.toString());
                 while (true) {
                     try {
-                        LinkedHashMap<String, String> map = log.getLogNewLineToMap();
+                        ArrayList<String> map = log.getLogNewLineToList();
                         if (map.size() > 0) {
                             LogJson lj = new LogJson();
                             lj.logs = map;
@@ -233,6 +233,7 @@ public class API {
             new NukkitRunnable() {
                 @Override
                 public void run() {
+                    Main.getInstance().getLogger().info("Input: " + json.cmd);
                     Server.getInstance().dispatchCommand(new ConsoleCommandSender(), json.cmd);
                 }
             }.runTask(Main.getInstance());

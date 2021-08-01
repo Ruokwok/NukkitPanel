@@ -7,6 +7,7 @@ import org.apache.commons.io.IOUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 
@@ -14,7 +15,7 @@ public class Log {
 
     private int line;
     private int j = 1;
-    private File file = new File("logs/server.log");
+    private final File file = new File("logs/server.log");
 
     public String getLogs() {
         try {
@@ -26,18 +27,18 @@ public class Log {
     }
 
 
-    public LinkedHashMap<String, String> getLogToMap() {
-        LinkedHashMap<String, String> map = stringToMap(Objects.requireNonNull(getLogs()).split("\n"));
+    public ArrayList<String> getLogToList() {
+        ArrayList<String> map = stringToList(Objects.requireNonNull(getLogs()).split("\n"));
         line = getLogLine();
         return map;
     }
 
-    public LinkedHashMap<String, String> getLogNewLineToMap() {
+    public ArrayList<String> getLogNewLineToList() {
         int newLine = getLogLine();
-        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+        ArrayList<String> map = new ArrayList<String>();
         if (newLine > line) {
             try {
-                map = stringToMap(FileIO.getToEnd(line + 1, file).split("\n"));
+                map = stringToList(FileIO.getToEnd(line + 1, file).split("\n"));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -56,27 +57,26 @@ public class Log {
     }
 
 
-    public LinkedHashMap<String, String> stringToMap(String[] logs) {
-        LinkedHashMap<String, String> map = new LinkedHashMap<>();
-
-        for (int i = 0; i < logs.length; i++) {
-            if (logs[i].indexOf('-') == 4 && logs[i].indexOf(':') == 13 && logs[i].indexOf('.') == 19) {
-                String time = j + "@" +logs[i].split(" ")[1].split("\\.")[0];
-                String type = Common.subString(logs[i], "] ", " - ").trim();
-                String log = logs[i].split(" - ")[1];
-                try {
-                    map.put(time + "[" + type + "]", log);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else {
-                String time = j + "@";
-                String log = logs[i];
-                map.put(time, log);
-            }
+    public ArrayList<String> stringToList(String[] logs) {
+        ArrayList<String> map = new ArrayList<>();
+        for (String log : logs) {
+            String l = log.replace("\r", "")
+                        .replaceFirst("\\d{4}-\\d{2}-\\d{2}", "§3")
+                        .replaceFirst("\\.\\d{3}", "§f")
+                        .replaceFirst("\\[(.*?)]", "")
+                        .replaceFirst("  ", "[")
+                        .replaceFirst(" -", "]")
+                        .replaceFirst("Caused by:", "§4Caused by:")
+                        .replaceFirst("java.", "§4java.")
+                        .replaceFirst("INFO", "§1INFO§f")
+                        .replaceFirst("WARN", "§4WARN§f")
+                        .replaceFirst("ERROR", "§4ERROR§f")
+                        .replaceFirst("FATAL", "§4FATAL§f").trim()
+                        .replaceFirst("at ", "    §4at ")
+                        .replaceFirst("\\.\\.\\. ", "    §4... ");
+            map.add(l);
             j++;
         }
-
         return map;
     }
 
