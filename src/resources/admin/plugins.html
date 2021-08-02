@@ -158,8 +158,10 @@
 					}
 					mainp.appendChild(mainv);
 					
-					bu.appendChild(ra);
-					bu.appendChild(ba);
+				    if (name != 'NukkitPanel') {
+				        bu.appendChild(ra);
+                        bu.appendChild(ba);
+				    }
 					ra.appendChild(reload);
 					ba.appendChild(button);
 					panel.appendChild(item);
