@@ -4,6 +4,18 @@
 	<meta name="viewport" content="initial-scale=1, user-scalable=0, minimal-ui">
 	<meta http-equiv="Content-Type" content="text/html; charset={{web.charset}}">
 	<script src="../res/js/spark-md5.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/ace/test/ace.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/ace/test/mode-javascript.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/ace/test/mode-yaml.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/ace/test/mode-json.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/ace/test/mode-php.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/ace/test/mode-lua.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/ace/test/mode-python.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/ace/test/mode-html.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/ace/test/mode-css.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/ace/test/mode-properties.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/ace/test/theme-twilight.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/ace/test/ext-searchbox.min.js"></script>
     {{web.src}}
 </head>
 <body class="mdui-theme-primary-indigo mdui-drawer-body-left mdui-color-grey-300">
@@ -12,13 +24,13 @@
 
 <div id="fileList" class="mdui-container mdui-center" style="width:100%">
 <div>
-	<a href="javascript:back();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" id="back">{{return-parent}}</button></a>
-	<a href="javascript:update();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1">{{refresh}}</button></a>
-	<a href="javascript:upload();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1">{{upload}}</button></a>
-	<a href="javascript:create();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1">{{create}}</button></a>
-	<a href="javascript:remove();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" id="del" disabled>{{delete}}</button></a>
-	<a href="javascript:copy();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" id="copyb" disabled>{{copy}}</button></a>
-	<a href="javascript:move();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" id="moveb" disabled>{{move}}</button></a>
+	<button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" onclick="back()" id="back">{{return-parent}}</button>
+	<button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" onclick="update()">{{refresh}}</button>
+	<button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" onclick="upload()">{{upload}}</button>
+	<button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" onclick="create()">{{create}}</button>
+	<button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" onclick="remove()" id="del" disabled>{{delete}}</button>
+	<button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" onclick="copy()" id="copyb" disabled>{{copy}}</button>
+	<button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" onclick="move()" id="moveb" disabled>{{move}}</button>
 	
 <!--	<button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1">粘贴</button>-->
 	<div class="mdui-typo">
@@ -47,11 +59,11 @@
 	
 </div>
 </div>
-<div id="fileEdit" hidden>
-<a href="javascript:save();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" id="del">{{save}}</button></a>
-<a href="javascript:close();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" id="del">{{close}}</button></a>
-<p class="mdui-typo mdui-m-l-3" id="editing" ></p>
-<textarea id="textarea" class="mdui-color-grey-800 mdui-m-a-2 mdui-center" style="resize:none" cols=100% rows=60%></textarea>
+<div class="mdui-typo" id="fileEdit" hidden>
+    <button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" onclick="save()">{{save}}</button>
+    <button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1" onclick="_close()">{{close}}</button>
+    <code class=" mdui-m-l-3" id="editing" ></code>
+    <div id="editor" style="width:100%;height:700px"></div>
 </div>
 
 <div class="mdui-dialog mdui-typo" id="upload">
@@ -117,7 +129,25 @@
 </div>
 </body>
 <script>
+var editor = ace.edit('editor');
+editor.setTheme("ace/theme/twilight");
+editor.setHighlightActiveLine(true);
+editor.setFontSize(16);
+
 {{js.websocket}}
+function highlight(type) {
+    var t;
+    if (endsWith(type, ".js")) t = "javascript";
+    if (endsWith(type, ".php")) t = "php";
+    if (endsWith(type, ".lua")) t = "lua";
+    if (endsWith(type, ".py")) t = "python";
+    if (endsWith(type, ".yml")) t = "yaml";
+    if (endsWith(type, ".json")) t = "json";
+    if (endsWith(type, ".html")) t = "html";
+    if (endsWith(type, ".css")) t = "css";
+    if (endsWith(type, ".properties")) t = "properties";
+    editor.session.setMode("ace/mode/" + t);
+}
 var position = "";
 var selected = new Array();
 var copy;
@@ -137,9 +167,12 @@ ws.onmessage = function(event) {
 	} else if (data.type == "READ_FILE") {
 		if(data.code == 200) {
 			showEdit(data.content, data.file);
+			editor.moveCursorTo(0, 0);
 		} else if(data.code == 501) {
 			tips("{{file-is-large}}");
 		}
+	} else if (data.type == "TIPS") {
+	    tips(data.message);
 	} else {
 		selected .splice(0,selected.length);
 		updataSelect();
@@ -409,12 +442,14 @@ function edit(file) {
 function showEdit(content, file) {
 	document.getElementById('fileEdit').hidden = false;
 	document.getElementById('fileList').hidden = true;
-	document.getElementById('textarea').value = decodeUnicode($.base64.decode(content));
+	editor.setValue (decodeUnicode($.base64.decode(content)));
+	highlight(file);
 	document.getElementById("editing").innerText = file;
 	editing = file;
 }
 
-function close() {
+function _close() {
+console.log('close')
 	document.getElementById('fileEdit').hidden = true;
 	document.getElementById('fileList').hidden = false;
 	editing = "";
@@ -438,7 +473,7 @@ function save() {
 	j.token = getToken();
 	j.type = "SAVE_FILE";
 	j.file = editing;
-	j.content = $.base64.encode(encodeUnicode(document.getElementById('textarea').value));
+	j.content = $.base64.encode(encodeUnicode(editor.getValue()));
 	send(toString(j));
 }
 
