@@ -515,7 +515,9 @@ public class API {
             FileSaveJson json = gson.fromJson(p, FileSaveJson.class);
             try {
                 FileUtils.writeStringToFile(new File(json.file), Common.decodeUnicode(new String(Base64.getDecoder().decode(json.content))), "UTF-8");
+                s.send(new TipsJson(R.get("file-save-success")).toString());
             } catch (IOException e) {
+                s.send(new TipsJson(R.get("file-save-fail") + e.getMessage()).toString());
                 e.printStackTrace();
             }
             return null;
