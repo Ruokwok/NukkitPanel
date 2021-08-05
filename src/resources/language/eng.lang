@@ -117,3 +117,5 @@ level-name=level name
 level-chunks=chunks
 level-entity=entities
 level-player=players
+file-save-success=File saved successfully！
+file-save-fail=Save failed！

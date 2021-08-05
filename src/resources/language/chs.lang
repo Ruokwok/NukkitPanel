@@ -117,3 +117,5 @@ level-name=世界名称
 level-chunks=区块数
 level-entity=实体数
 level-player=玩家数
+file-save-success=保存成功！
+file-save-fail=保存失败！
