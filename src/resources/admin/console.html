@@ -22,17 +22,17 @@
   
   <div class="mdui-col-xs-12 mdui-col-ms-3 mdui-m-r-3" style="display:flex;flex-wrap:wrap">
   <div class="mdui-row">
-	<a class="mdui-m-a-1" href="javascript:reload();"><button class="mdui-btn mdui-ripple mdui-color-theme">{{reload}}</button></a>
-	<a class="mdui-m-r-4" href="javascript:stop();"><button class="mdui-btn mdui-ripple mdui-color-theme">{{shutdown}}</button></a>
+	<button onclick="reload()" class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1">{{reload}}</button>
+	<button onclick="stop()" class="mdui-btn mdui-ripple mdui-color-theme mdui-m-r-4">{{shutdown}}</button>
   </div>
   <div class="mdui-col-xs-12 mdui-col-sm-6">
   <div class="mdui-row" class="mdui-m-l-3">
-	  <div class="mdui-textfield">
-		<input id="cmd" class="mdui-textfield-input" type="text" placeholder="Command"/>
-	  </div>
+<!--	  <div class="mdui-textfield">-->
+          <input id="cmd" class="mdui-textfield-input" type="text" placeholder="Command" style="height:45px"/>
+<!--	  </div>-->
   </div>
   </div>
-  <a href="javascript:enter();"><button class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1 mdui-float-right">Enter</button></a>
+  <button onclick="enter()" class="mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1 mdui-float-right">Enter</button>
   </div>
 
 </div>

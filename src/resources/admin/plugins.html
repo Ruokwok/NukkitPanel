@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
 	<meta name="viewport" content="initial-scale=1, user-scalable=0, minimal-ui">
@@ -54,6 +55,8 @@
 			var data = JSON.parse(event.data);
 			if(data.type == "NO_PERMISSION") {
 				gotoPage("login");
+			} else if (data.type == "GOTO") {
+			    gotoPage(data.page);
 			} else {
 				var panel =document.getElementById('panel');
 				var count =document.getElementById('count');
