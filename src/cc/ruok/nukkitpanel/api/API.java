@@ -177,7 +177,7 @@ public class API {
                         j.ver = server.getVersion();
                         j.protocol = ProtocolInfo.CURRENT_PROTOCOL;
                         j.tps = server.getTicksPerSecond();
-                        j.motd = server.getMotd();
+                        j.motd = server.getMotd().replaceAll("§.", "");
                         String nk = (server.getCodename().equals(""))? "NukkitX": server.getCodename();
                         j.nukkit = nk.contains("Nukkit")? nk: server.getName();
                         long time = System.currentTimeMillis() - Nukkit.START_TIME;
@@ -273,10 +273,16 @@ public class API {
                 Server.getInstance().getPluginManager().disablePlugin(plugin);
                 Server.getInstance().getPluginManager().enablePlugin(plugin);
             }
-            GotoJson r = new GotoJson();
-            r.type = "GOTO";
-            r.page = "plugins";
-            s.send(r.toString());
+            new Thread(() -> {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                GotoJson r = new GotoJson();
+                r.page = "plugins";
+                s.send(r.toString());
+            }).start();
             return null;
         };
     }
