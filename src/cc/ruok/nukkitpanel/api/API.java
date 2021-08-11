@@ -1,5 +1,7 @@
 package cc.ruok.nukkitpanel.api;
 
+import cc.ruok.bpm.BPM;
+import cc.ruok.bpm.DownloadException;
 import cc.ruok.nukkitpanel.Config;
 import cc.ruok.nukkitpanel.Log;
 import cc.ruok.nukkitpanel.Main;
@@ -79,6 +81,10 @@ public class API {
         apis.put("GET_TASKS", taskList());
         apis.put("CREATE_TASK", createTask());
         apis.put("DELETE_TASK", deleteTask());
+        apis.put("BPM_SEARCH", bpmSearch());
+        apis.put("BPM_INFO", bpmInfo());
+        apis.put("BPM_OPERATION", bpmOperation());
+        apis.put("BPM_CHECK", bpmCheck());
     }
 
     public void registerHandler(String key, Handler handler) {
@@ -272,6 +278,16 @@ public class API {
             } else if (json.on == 2) {
                 Server.getInstance().getPluginManager().disablePlugin(plugin);
                 Server.getInstance().getPluginManager().enablePlugin(plugin);
+            } else if (json.on == 3) {
+                try {
+                    new BPM().delete(plugin, server);
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    s.send(new TipsJson(R.get("bpm-del-exception") + e.getMessage()).toString());
+                    return null;
+                }
             }
             new Thread(() -> {
                 try {
@@ -602,6 +618,76 @@ public class API {
             GetTasksJson j = gson.fromJson(p, GetTasksJson.class);
             j.tasks = TaskManager.getList();
             s.send(j.toString());
+            return null;
+        };
+    }
+
+    private Handler bpmSearch() {
+        return (p,s) -> {
+            BpmSearchJson json = gson.fromJson(p, BpmSearchJson.class);
+            new Thread(() -> {
+                BPM bpm = new BPM();
+                HashMap<String, String> search = bpm.search(json.word);
+                json.list = search;
+                s.send(json.toString());
+            }).start();
+            return null;
+        };
+    }
+
+    private Handler bpmInfo() {
+        return (p,s) -> {
+            BpmInfoJson json = gson.fromJson(p, BpmInfoJson.class);
+            new Thread(() -> {
+                BPM bpm = new BPM();
+                BpmInfoJson info = new BpmInfoJson(bpm.info(json.name));
+                s.send(info.toString());
+            }).start();
+            return null;
+        };
+    }
+
+    private Handler bpmOperation() {
+        return (p,s) -> {
+            BpmOperationJson json = gson.fromJson(p, BpmOperationJson.class);
+            new Thread(() -> {
+                try {
+                    File file = new BPM().install(json.plugin, json.version);
+                    if (file.exists()) {
+                        s.send(new TipsJson(json.plugin + " v" + json.version + " " + R.get("bpm-installed")).toString());
+                        Plugin plugin = server.getPluginManager().loadPlugin(file);
+                        Server.getInstance().getPluginManager().enablePlugin(plugin);
+                    } else {
+                        s.send(new TipsJson(R.get("bpm-install-fail")).toString());
+                    }
+                } catch (DownloadException e) {
+                    e.printStackTrace();
+                    s.send(new TipsJson(R.get("bpm-exception") + e.getMessage()).toString());
+                }
+            }).start();
+            return null;
+        };
+    }
+
+    private Handler bpmCheck() {
+        return (p, s) -> {
+            BpmCheckJson json = gson.fromJson(p, BpmCheckJson.class);
+            Plugin plugin = server.getPluginManager().getPlugin(json.plugin);
+            if (plugin == null) return null;
+            new Thread(() -> {
+                BPM bpm = new BPM();
+                String version = plugin.getDescription().getVersion();
+                String check = bpm.check(json.plugin);
+                if (check == null) {
+                    s.send(new TipsJson(R.get("bpm-not-found")).toString());
+                } else if (version.equals(check)) {
+                    s.send(new TipsJson(R.get("bpm-newest")).toString());
+                } else {
+                    json.version = version;
+                    json.newest = check;
+                    s.send(json.toString());
+                }
+            }).start();
             return null;
         };
     }
