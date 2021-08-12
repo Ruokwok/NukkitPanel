@@ -31,6 +31,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.*;
 
 public class API {
@@ -627,9 +628,13 @@ public class API {
             BpmSearchJson json = gson.fromJson(p, BpmSearchJson.class);
             new Thread(() -> {
                 BPM bpm = new BPM();
-                HashMap<String, String> search = bpm.search(json.word);
-                json.list = search;
-                s.send(json.toString());
+                try {
+                    HashMap<String, String> search = bpm.search(json.word);
+                    json.list = search;
+                    s.send(json.toString());
+                } catch (Exception e) {
+                    s.send(new TipsJson(e.getMessage()).toString());
+                }
             }).start();
             return null;
         };
