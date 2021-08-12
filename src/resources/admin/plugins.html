@@ -11,16 +11,31 @@
 
 
 <div class="mdui-typo">
-<h4 class="mdui-m-a-3">{{loaded-plugin}}<text id="count"></text></h4>
 </div>
 <div class="mdui-container">
-  <div class="mdui-panel" id="panel" mdui-panel>
-  </div>
+    <div class="mdui-tab mdui-tab-full-width" id="tab">
+        <a href="#tab1-content" id="tab1" class="mdui-ripple" onclick="update()">{{installed}}</a>
+        <a href="#tab2-content" id="tab2" class="mdui-ripple">{{plugin-store}}</a>
+    </div>
+    <div id="tab1-content" class="mdui-p-a-2">
+        <div class="mdui-panel" id="panel" mdui-panel></div>
+    </div>
+    <div id="tab2-content" class="mdui-p-a-2">
+        <div style="display:flex;flex-wrap:wrap">
+            <div style="width:70%">
+                <input class="mdui-textfield-input" type="text" placeholder="Plugin name" id="word"/>
+            </div>
+            <button class="mdui-btn mdui-ripple mdui-color-theme mdui-float-right mdui-m-l-1" onclick="search()">{{search}}</button>
+        </div>
+        <div class="mdui-panel" id="store" mdui-panel></div>
+    </div>
+
 </div>
 </body>
 <script>
 {{js.websocket}}
 
+var inst = new mdui.Tab('#tab');
 		function onOper(plugin, oper) {
 			mdui.dialog({
 			title: '{{confirm-operation}}',
@@ -43,24 +58,205 @@
 			});
 		}
 
-		//建立连接事件
-		ws.onopen = function(evt) {
-			var json = {};
+		function onUpdate(data) {
+		    var j = JSON.parse(data);
+			mdui.dialog({
+			title: '{{bpm-updates}}' + j.newest,
+			buttons: [
+				{
+				  text: '{{cancel}}'
+				},
+				{
+				  text: '{{update}}',
+				  onClick: function(inst){
+					var json = {};
+                    json.type = "BPM_OPERATION";
+                    json.operation = "install";
+                    json.plugin = j.plugin;
+                    json.version = j.newest;
+                    json.token = getToken();
+                    send(toString(json));
+                    bar("{{bpm-installing}}");
+				  }
+				}
+			  ]
+			});
+		}
+
+		function search() {
+		    var w = $("#word").val();
+		    var json = {};
+			json.type = "BPM_SEARCH";
+			json.word = w;
+			json.token = getToken();
+			send(toString(json));
+		}
+
+		function info(name) {
+		    if ($('#au_' + name).text() == 'Loading...') {
+                var json = {};
+                json.type = "BPM_INFO";
+                json.name = name;
+                json.token = getToken();
+                send(toString(json));
+		    }
+		}
+
+		function check(name) {
+            var json = {};
+            json.type = "BPM_CHECK";
+            json.plugin = name;
+            json.token = getToken();
+            send(toString(json));
+		}
+
+		function install(plugin) {
+		    var json = {};
+			json.type = "BPM_OPERATION";
+			json.operation = "install";
+			json.plugin = plugin;
+			json.version = $('#vs_' + plugin).val()
+			json.token = getToken();
+			send(toString(json));
+			bar("{{bpm-installing}}"); f
+		}
+
+		function update() {
+		    var json = {};
 			json.type = "GET_PLUGINS";
 			json.token = getToken();
 			send(toString(json));
+			$('#panel').html("");
+		}
+
+		//建立连接事件
+		ws.onopen = function(evt) {
+			update();
 		};
 		
 		ws.onmessage = function(event) {
 			var data = JSON.parse(event.data);
 			if(data.type == "NO_PERMISSION") {
 				gotoPage("login");
+			} else if (data.type == "TIPS") {
+			    tips(data.message);
 			} else if (data.type == "GOTO") {
 			    gotoPage(data.page);
+			} else if (data.type == "BPM_CHECK") {
+                onUpdate(event.data);
+			} else if (data.type == "BPM_INFO") {
+			    $('#au_' + data.info.plugin).text(data.info.author);
+			    $('#lk_' + data.info.plugin).text(data.info.website);
+			    $('#lk_' + data.info.plugin).attr("href", data.info.website);
+			    $('#lk_' + data.info.plugin).attr("target", "_blank");
+			    var s = document.getElementById('vs_' + data.info.plugin);
+			    for(var key in data.info.list){
+                    var o = document.createElement('option')
+                    $(o).text(key);
+                    s.appendChild(o);
+                    //$(s).attr('mdui-select', true);
+                }
+                $(s).val(data.info.newest);
+                mdui.mutation();
+                $('#in_' + data.info.plugin).attr('disabled', false);
+			} else if (data.type == "BPM_SEARCH") {
+			    console.log(data);
+			    var panel = document.getElementById('store');
+			    panel.innerText = "";
+				for(var key in data.list){
+					var name = key;
+					var ver = data.list[key];
+					var item = document.createElement('div');
+					item.className = "mdui-panel-item";
+					$(item).attr('onclick', 'info("' + key + '")')
+
+					var head = document.createElement('div');
+					head.className = "mdui-panel-item-header";
+
+					var run = document.createElement('i');
+					run.innerText = "extension";
+					run.className = "mdui-icon material-icons mdui-text-color-orange";
+
+					var title = document.createElement('div');
+					title.className = "mdui-panel-item-title mdui-m-l-3";
+					title.innerText = name;
+
+					var sub = document.createElement('div');
+					sub.className = "mdui-panel-item-summary";
+					sub.innerText = ver;
+
+					var ic = document.createElement('i');
+					ic.className = "mdui-panel-item-arrow mdui-icon material-icons";
+					ic.innerText = "keyboard_arrow_down";
+
+					var body = document.createElement('div');
+					body.className = "mdui-panel-item-body";
+
+					var typo = document.createElement('div');
+					typo.className = "mdui-typo";
+
+					var authorp = document.createElement('p');
+					authorp.innerText = key;
+
+					var authorv = document.createElement('code');
+					authorv.innerText = data.list[key];
+
+					var mainp = document.createElement('p');
+					mainp.innerText = "{{author}}";
+
+					var mainv = document.createElement('code');
+					mainv.innerText = "Loading...";
+					$(mainv).attr('id', 'au_' + key);
+
+					var link = document.createElement('p');
+					link.innerText = "{{link}}";
+
+					var linkv = document.createElement('a');
+					linkv.innerText = "Loading...";
+					$(linkv).attr('id', 'lk_' + key);
+
+					var bu = document.createElement('div');
+					bu.className = "mdui-panel-item-actions";
+
+					var button = document.createElement('button');
+					button.className = "mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1";
+					button.innerText = "{{install}}";
+					$(button).attr('id', 'in_' + key);
+					$(button).attr('disabled', true);
+					$(button).attr('onclick', 'install("' + key + '")');
+
+					var select = document.createElement('select');
+					select.className = "mdui-select";
+					$(select).attr('id', 'vs_' + key);
+					//$(select).attr('mdui-select', true);
+
+					item.appendChild(head);
+					item.appendChild(body);
+
+					head.appendChild(run);
+					head.appendChild(title);
+					head.appendChild(sub);
+					head.appendChild(ic);
+
+					body.appendChild(typo);
+					body.appendChild(bu);
+
+					typo.appendChild(authorp);
+					typo.appendChild(mainp);
+					typo.appendChild(link);
+
+					authorp.appendChild(authorv);
+					mainp.appendChild(mainv);
+					link.appendChild(linkv);
+
+					bu.appendChild(select);
+					bu.appendChild(button);
+					panel.appendChild(item);
+				}
 			} else {
 				var panel =document.getElementById('panel');
-				var count =document.getElementById('count');
-				count.innerText = "(" + data.length + "):";
+				var count =document.getElementById('tab1');
+				count.innerText = "{{installed}}(" + data.length + ")";
 				for(var i=0;i < data.length;i++){
 					var name = data[i].name;
 					var ver = data[i].ver;
@@ -120,14 +316,9 @@
 					var bu = document.createElement('div');
 					bu.className = "mdui-panel-item-actions";
 					
-					var ba = document.createElement('a');
-					ba.href = "javascript:onOper('" + name + "',"+((on)?0:1)+")";
-					
-					var ra = document.createElement('a');
-					ra.href = "javascript:onOper('" + name + "',2)";
-					
 					var button = document.createElement('button');
 					button.className = "mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1";
+					$(button).attr("onclick", "onOper('" + name + "',"+((on)?0:1)+")");
 					if(on) {
 						button.innerText = "{{disable}}";
 					}else{
@@ -137,7 +328,18 @@
 					var reload = document.createElement('button');
 					reload.className = "mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1";
 					reload.innerText = "{{reload}}";
-					
+					$(reload).attr("onclick", "onOper('" + name + "',2)");
+
+					var del = document.createElement('button');
+					del.className = "mdui-btn mdui-ripple mdui-color-red mdui-m-a-1";
+					del.innerText = "{{delete}}";
+					$(del).attr("onclick", "onOper('" + name + "',3)");
+
+					var upd = document.createElement('button');
+					upd.className = "mdui-btn mdui-ripple mdui-color-pink-accent mdui-m-a-1";
+					upd.innerText = "{{check-update}}";
+					$(upd).attr("onclick", "check('" + name + "')");
+
 					
 					item.appendChild(head);
 					item.appendChild(body);
@@ -162,11 +364,11 @@
 					mainp.appendChild(mainv);
 					
 				    if (name != 'NukkitPanel') {
-				        bu.appendChild(ra);
-                        bu.appendChild(ba);
+				        bu.appendChild(upd);
+				        bu.appendChild(reload);
+                        bu.appendChild(button);
+                        bu.appendChild(del);
 				    }
-					ra.appendChild(reload);
-					ba.appendChild(button);
 					panel.appendChild(item);
 				}
 				
