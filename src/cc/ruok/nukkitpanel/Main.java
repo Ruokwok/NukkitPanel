@@ -7,6 +7,7 @@ import cc.ruok.nukkitpanel.servers.http.PanelHttpServer;
 import cc.ruok.nukkitpanel.servers.websocket.WebSocketServer;
 import cc.ruok.nukkitpanel.task.TaskList;
 import cc.ruok.nukkitpanel.task.TaskManager;
+import cc.ruok.nukkitpanel.utils.MetricsLite;
 import cn.nukkit.plugin.PluginBase;
 
 import java.io.File;
@@ -43,6 +44,7 @@ public class Main extends PluginBase {
 //            e.printStackTrace();
         }
         ModuleManager.getInstance().loadAll();
+        MetricsLite metrics = new MetricsLite(this, 12409);
     }
 
 
