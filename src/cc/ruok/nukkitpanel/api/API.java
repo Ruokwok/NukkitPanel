@@ -31,7 +31,6 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.util.*;
 
 public class API {
@@ -275,9 +274,9 @@ public class API {
             if (json.on == 1) {
                 Server.getInstance().getPluginManager().enablePlugin(plugin);
             } else if (json.on == 0){
-                Server.getInstance().getPluginManager().disablePlugin(plugin);
+                new BPM().disablePlugin(plugin);
             } else if (json.on == 2) {
-                Server.getInstance().getPluginManager().disablePlugin(plugin);
+                new BPM().disablePlugin(plugin);
                 Server.getInstance().getPluginManager().enablePlugin(plugin);
             } else if (json.on == 3) {
                 try {
