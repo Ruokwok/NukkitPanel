@@ -51,11 +51,12 @@ public class FileIO {
         File root = new File(path);
         File[] files = root.listFiles();
         ArrayList<FileInfo> list = new ArrayList<>();
-        for (int i = 0; i < files.length; i++) {
+        if (files == null) return list;
+        for (File file : files) {
             FileInfo fi = new FileInfo();
-            fi.name = files[i].getName();
-            fi.dir = files[i].isDirectory();
-            fi.size = files[i].length();
+            fi.name = file.getName();
+            fi.dir = file.isDirectory();
+            fi.size = file.length();
             list.add(fi);
         }
         return list;
