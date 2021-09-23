@@ -272,12 +272,12 @@ public class API {
             SetPluginJson json = gson.fromJson(p, SetPluginJson.class);
             Plugin plugin = manager.getPlugin(json.name);
             if (json.on == 1) {
-                Server.getInstance().getPluginManager().enablePlugin(plugin);
+                server.getPluginManager().enablePlugin(plugin);
             } else if (json.on == 0){
-                new BPM().disablePlugin(plugin);
+                server.getPluginManager().disablePlugin(plugin);
             } else if (json.on == 2) {
-                new BPM().disablePlugin(plugin);
-                Server.getInstance().getPluginManager().enablePlugin(plugin);
+                server.getPluginManager().disablePlugin(plugin);
+                server.getPluginManager().enablePlugin(plugin);
             } else if (json.on == 3) {
                 try {
                     new BPM().delete(plugin, server);
