@@ -46,7 +46,11 @@ public class Config {
             }
             status = true;
         } catch (IOException e) {
-            e.printStackTrace();
+            status = false;
+            wsPort = 20000;
+            mdui = false;
+            lang = "auto";
+            charset = setCharset("auto");
         }
     }
 
