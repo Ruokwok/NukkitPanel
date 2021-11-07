@@ -21,6 +21,7 @@ public class Config {
     private static int ftpPort;
     private static boolean ftp;
     private static boolean site;
+    private static boolean status = false;
 
     public static void load() {
         try {
@@ -43,6 +44,7 @@ public class Config {
             } catch (Exception e) {
                 wsPort = Net.getPortOfTCP();
             }
+            status = true;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -120,5 +122,9 @@ public class Config {
 
     public static boolean onSite() {
         return site;
+    }
+
+    public static boolean isOk() {
+        return status;
     }
 }
