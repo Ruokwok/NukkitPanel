@@ -52,8 +52,15 @@ public class R {
         return html;
     }
 
-    public static Map<String, String> getLanguagePackage() {
-        String lang = Config.getLang();
+    public static String format(String html, String l) {
+        Map<String, String> language = getLanguagePackage(l);
+        for (Map.Entry<String, String> entry : language.entrySet()) {
+            html = html.replaceAll("\\{\\{" + entry.getKey() + "}}", entry.getValue());
+        }
+        return html;
+    }
+
+    public static Map<String, String> getLanguagePackage(String lang) {
         String pkg = "";
         URL url = Main.class.getResource("/resources/language/" + Server.getInstance().getLanguage().getLang() + ".lang");
         if (lang.equals("auto")) {
@@ -72,7 +79,7 @@ public class R {
             }
         } else {
             try {
-                pkg = IOUtils.toString(Main.class.getResource("/resources/language/" + Config.getLang() + ".lang"), "utf8");
+                pkg = IOUtils.toString(Main.class.getResource("/resources/language/" + lang + ".lang"), "utf8");
             } catch (IOException e) {
                     try {
                         pkg = IOUtils.toString(Main.class.getResource("/resources/language/eng.lang"), "utf8");
@@ -82,6 +89,10 @@ public class R {
                 }
         }
         return Common.ini2map(pkg);
+    }
+
+    public static Map<String, String> getLanguagePackage() {
+        return getLanguagePackage(Config.getLang());
     }
 
     public static String getMainPage(InetSocketAddress address) {
@@ -114,6 +125,16 @@ public class R {
 
     public static String getTaskPage(InetSocketAddress address) {
         return Format.formatAddress(taskPage, address);
+    }
+
+    public static String getPage(String page, InetSocketAddress address, String lang) throws IOException {
+        String html = Format.formatHTML(IOUtils.toString(Main.class.getResource("/resources/" + page), "utf8"));
+        return Format.formatAddress(format(html, lang), address);
+    }
+
+    public static String getPage(String page, InetSocketAddress address) throws IOException {
+        String html = Format.formatHTML(IOUtils.toString(Main.class.getResource("/resources/" + page), "utf8"));
+        return Format.formatAddress(format(html), address);
     }
 
     public static String get(String str) {
