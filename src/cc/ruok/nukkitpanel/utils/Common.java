@@ -184,4 +184,15 @@ public class Common {
         return result;
     }
 
+    public static Map<String, String> urlGet(String url) {
+        String list = url.contains("?")?url.substring(url.indexOf("?")):url;
+        String[] split = list.split("&");
+        HashMap<String, String> map = new HashMap<>();
+        for (String s : split) {
+            int i = s.indexOf("=");
+            map.put(s.substring(0, i), s.substring(i + 1));
+        }
+        return map;
+    }
+
 }
