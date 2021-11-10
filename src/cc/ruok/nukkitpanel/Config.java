@@ -22,15 +22,18 @@ public class Config {
     private static boolean ftp;
     private static boolean site;
     private static boolean status = false;
+    private static String entry;
 
     public static void load() {
         try {
             Properties properties = new Properties();
             properties.load(new FileInputStream(new File(Main.getInstance().getDataFolder().getPath() + "/panel.properties")));
+            String en = properties.getProperty("panel-entry");
             charset = setCharset(properties.getProperty("charset"));
             username = properties.getProperty("username");
             password = properties.getProperty("password");
             lang = properties.getProperty("language");
+            entry = (en.startsWith("/"))? en : "/" + en;
             keep = Long.parseLong(properties.getProperty("keep-connected"));
             mdui = properties.getProperty("local-mdui").equals("on");
             ftp = properties.getProperty("ftp-server").equals("on");
@@ -50,6 +53,7 @@ public class Config {
             wsPort = 20000;
             mdui = false;
             lang = "auto";
+            entry = "/admin";
             charset = setCharset("auto");
         }
     }
@@ -130,5 +134,9 @@ public class Config {
 
     public static boolean isOk() {
         return status;
+    }
+
+    public static String getEntry() {
+        return entry;
     }
 }
