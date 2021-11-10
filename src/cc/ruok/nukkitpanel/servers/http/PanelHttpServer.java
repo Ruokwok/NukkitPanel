@@ -6,11 +6,9 @@ import cc.ruok.nukkitpanel.modules.ModuleManager;
 import cc.ruok.nukkitpanel.utils.Format;
 import cn.nukkit.Server;
 import com.sun.net.httpserver.HttpServer;
-import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.Map;
 
 public class PanelHttpServer {
 
@@ -21,19 +19,22 @@ public class PanelHttpServer {
     private PanelHttpServer() {
         try {
             httpServer = HttpServer.create(new InetSocketAddress(Server.getInstance().getPort()), 0);
-            httpServer.createContext("/admin", PanelHandler.adminIndex());
-            httpServer.createContext("/admin/res", PanelHandler.file());
-            httpServer.createContext("/admin/image", PanelHandler.image());
-            httpServer.createContext("/admin/main", PanelHandler.adminMain());
-            httpServer.createContext("/admin/login", PanelHandler.adminLogin());
-            httpServer.createContext("/admin/console", PanelHandler.adminConsole());
-            httpServer.createContext("/admin/log", PanelHandler.adminLog());
-            httpServer.createContext("/admin/plugins", PanelHandler.adminPlugins());
-            httpServer.createContext("/admin/players", PanelHandler.adminPlayers());
-            httpServer.createContext("/admin/files", PanelHandler.adminFiles());
-            httpServer.createContext("/admin/download", PanelHandler.download());
-            httpServer.createContext("/admin/task", PanelHandler.adminTask());
-            if (Config.onSite()) {
+            httpServer.createContext(Config.getEntry(), PanelHandler.adminIndex());
+            httpServer.createContext(Config.getEntry() + "/guide", PanelHandler.html("admin/guide.html"));
+            httpServer.createContext(Config.getEntry() + "/res", PanelHandler.file());
+            httpServer.createContext(Config.getEntry() + "/image", PanelHandler.image());
+            httpServer.createContext(Config.getEntry() + "/main", PanelHandler.adminMain());
+            httpServer.createContext(Config.getEntry() + "/login", PanelHandler.adminLogin());
+            httpServer.createContext(Config.getEntry() + "/console", PanelHandler.adminConsole());
+            httpServer.createContext(Config.getEntry() + "/log", PanelHandler.adminLog());
+            httpServer.createContext(Config.getEntry() + "/plugins", PanelHandler.adminPlugins());
+            httpServer.createContext(Config.getEntry() + "/players", PanelHandler.adminPlayers());
+            httpServer.createContext(Config.getEntry() + "/files", PanelHandler.adminFiles());
+            httpServer.createContext(Config.getEntry() + "/download", PanelHandler.download());
+            httpServer.createContext(Config.getEntry() + "/task", PanelHandler.adminTask());
+            if (!Config.isOk()) {
+                httpServer.createContext("/", PanelHandler.html("admin/guide.html"));
+            } else if (Config.onSite()) {
                 httpServer.createContext("/", PanelHandler.website());
             }
             httpServer.start();

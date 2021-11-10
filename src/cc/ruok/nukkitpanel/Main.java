@@ -61,6 +61,8 @@ public class Main extends PluginBase {
             // not print
         } catch (InterruptedException e) {
              e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -78,10 +80,10 @@ public class Main extends PluginBase {
         if (!www.exists()) {
             www.mkdir();
         }
-        File c = new File(getDataFolder().getPath() + "/panel.properties");
-        if (!c.exists()) {
-            Files.copy(Main.class.getResourceAsStream("/resources/config/panel.properties"), c.toPath());
-        }
+//        File c = new File(getDataFolder().getPath() + "/panel.properties");
+//        if (!c.exists()) {
+//            Files.copy(Main.class.getResourceAsStream("/resources/config/panel.properties"), c.toPath());
+//        }
         File t = new File(getDataFolder().getPath() + "/tasks.json");
         if (!t.exists()) {
             TaskList taskList = new TaskList();

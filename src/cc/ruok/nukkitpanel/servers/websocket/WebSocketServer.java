@@ -51,7 +51,7 @@ public class WebSocketServer extends org.java_websocket.server.WebSocketServer {
         Json json = new Gson().fromJson(s, Json.class);
         String type = json.getType();
         API api = API.getInstance();
-        if (!type.equals("LOGIN")) {
+        if (!type.equals("LOGIN") && !type.equals("GUIDE")) {
             if (api.state(json)) {
                 api.get(type).run(s, webSocket);
             } else {

@@ -4,17 +4,25 @@ import cc.ruok.nukkitpanel.servers.Auth;
 import cc.ruok.nukkitpanel.Main;
 import cc.ruok.nukkitpanel.R;
 import cc.ruok.nukkitpanel.Config;
+import cc.ruok.nukkitpanel.utils.Common;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.util.Map;
 import java.util.Properties;
 
 class PanelHandler {
 
     protected static void format(HttpExchange http) throws IOException {
+        if (!Config.isOk()) {
+            byte[] bytes = ("<head> <meta http-equiv=\"refresh\" content=\"0;url=" + Config.getEntry() + "/guide/\"></head>").getBytes();
+            http.sendResponseHeaders(200, bytes.length);
+            http.getResponseBody().write(bytes);
+            http.close();
+        }
         if (!http.getRequestURI().getPath().endsWith("/")) {
             byte[] bytes = ("<head> <meta http-equiv=\"refresh\" content=\"0;url="+http.getRequestURI().getPath()+"/\"></head>").getBytes();
             http.sendResponseHeaders(200, bytes.length);
@@ -25,7 +33,7 @@ class PanelHandler {
 
     static HttpHandler adminIndex() {
         return http -> {
-            byte[] bytes = ("<head> <meta http-equiv=\"refresh\" content=\"0;url=/admin/main/\"></head>").getBytes();
+            byte[] bytes = ("<head> <meta http-equiv=\"refresh\" content=\"0;url=" + Config.getEntry() + "/main/\"></head>").getBytes();
             http.sendResponseHeaders(200, bytes.length);
             http.getResponseBody().write(bytes);
             http.close();
@@ -161,12 +169,56 @@ class PanelHandler {
      */
     static HttpHandler image() {
         return http -> {
-            InputStream file = Main.class.getResourceAsStream("/resources" + http.getRequestURI().getPath());
+            String path = http.getRequestURI().getPath();
+            path = (path.startsWith(Config.getEntry()))? path.replaceFirst(Config.getEntry(), "/admin") : path;
+            InputStream file = Main.class.getResourceAsStream("/resources" + path);
             http.getResponseHeaders().add("Content-Type", "image/png;");
             byte[] bytes = IOUtils.toByteArray(file);
             http.sendResponseHeaders(200, bytes.length);
             http.getResponseBody().write(bytes);
             http.close();
+        };
+    }
+
+    static HttpHandler html(String path) {
+        return http -> {
+            int code = 200;
+//            format(http);
+            if (new File(Main.getInstance().getDataFolder() + "/panel.properties").exists()) {
+                byte[] bytes = ("<head> <meta http-equiv=\"refresh\" content=\"0;url=" + Config.getEntry() + "/main/\"></head>").getBytes();
+                http.sendResponseHeaders(200, bytes.length);
+                http.getResponseBody().write(bytes);
+                http.close();
+                return;
+            }
+            http.getResponseHeaders().add("Content-Type", "text/html; charset=" + Config.getCharset());
+            String jre = System.getProperty("java.version");
+            String lang = "auto";
+            String query = http.getRequestURI().getQuery();
+            if (query != null && query.startsWith("lang=")) {
+                try {
+                    lang = Common.urlGet(query).get("lang");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            String page = R.getPage(path, http.getLocalAddress(), lang)
+                    .replaceAll("\\{\\{guide.jre}}", jre)
+                    .replaceAll("\\{\\{guide.lang}}", lang);
+            if (jre.startsWith("1.8")) {
+                page = page.replaceAll("\\{\\{guide.jre.status}}", "true");
+            } else {
+                page = page.replaceAll("\\{\\{guide.jre.status}}", "false");
+            }
+            try {
+                String _page = R.format(page, lang);
+                byte[] bytes = _page.getBytes();
+                http.sendResponseHeaders(code, bytes.length);
+                http.getResponseBody().write(bytes);
+                http.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         };
     }
 
@@ -177,6 +229,7 @@ class PanelHandler {
     static HttpHandler file() {
         return http -> {
             String path = http.getRequestURI().getPath();
+            path = (path.startsWith(Config.getEntry()))? path.replaceFirst(Config.getEntry(), "/admin") : path;
             InputStream file = Main.class.getResourceAsStream("/resources" + path);
             if (file == null) {
                 byte[] bytes = "<h1>404 Not Found</h1><hr><p>Nukkit Panel</p>".getBytes();

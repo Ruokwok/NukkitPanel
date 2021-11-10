@@ -15,6 +15,7 @@ import cc.ruok.nukkitpanel.task.TaskManager;
 import cc.ruok.nukkitpanel.utils.Common;
 import cc.ruok.nukkitpanel.utils.Format;
 import cc.ruok.nukkitpanel.utils.Monitor;
+import cc.ruok.nukkitpanel.utils.Net;
 import cn.nukkit.Nukkit;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
@@ -30,6 +31,8 @@ import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -58,6 +61,7 @@ public class API {
 
     public void registerHandlers() {
         apis.put("LOGIN", login());
+        apis.put("GUIDE", guide());
         apis.put("AUTH", auth());
         apis.put("GET_MAIN", main());
         apis.put("GET_LOG", log());
@@ -128,6 +132,48 @@ public class API {
                 e.printStackTrace();
                 return null;
             }
+        };
+    }
+
+    private Handler guide() {
+        return (p, s) -> {
+            GuideJson json = gson.fromJson(p, GuideJson.class);;
+            File file = new File(Main.getInstance().getDataFolder().getPath() + "/panel.properties");
+            if (file.exists()) {
+                s.send(new TipsJson(R.get("guide-fail")).toString());
+                return null;
+            }
+            Properties properties = new Properties();
+            String username = json.username.trim();
+            String password = json.password.trim();
+            String language = json.lang.trim();
+            String port = (json.port >= 0)? String.valueOf(json.port) : "auto";
+            String entry = json.entry.trim();
+            String ftp = (json.ftp)? "on" : "off";
+            int ftpPort = (json.ftpPort >= 0)? json.ftpPort : Net.getPortOfTCP();
+            String website = (json.website)? "on" : "off";
+            properties.setProperty("username", username);
+            properties.setProperty("password", password);
+            properties.setProperty("language", language);
+            properties.setProperty("websocket-port", port);
+            properties.setProperty("panel-entry", entry);
+            properties.setProperty("ftp-server", ftp);
+            properties.setProperty("ftp-port", String.valueOf(ftpPort));
+            properties.setProperty("website", website);
+            properties.setProperty("keep-connected", "120");
+            properties.setProperty("local-mdui", "off");
+            properties.setProperty("charset", "auto");
+            try {
+                file.createNewFile();
+                properties.store(new FileOutputStream(file), "Panel config file.");
+                Config.load();
+                R.load();
+                s.send(new TipsJson(R.get("guide-complete")).toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+                s.send(new TipsJson(R.get("guide-exception")).toString());
+            }
+            return null;
         };
     }
 

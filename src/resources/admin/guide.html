@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<head>
+  <meta name="viewport" content="initial-scale=1, user-scalable=0, minimal-ui">
+  <meta http-equiv="Content-Type" content="text/html; charset={{web.charset}}">
+  {{web.src}}
+
+</head>
+<body class="mdui-theme-primary-indigo mdui-color-grey-300">
+
+<h1 class="mdui-typo mdui-text-center">{{setting-guide}}</h1>
+<div class="mdui-container">
+
+  <div class="mdui-row">
+    <div class="mdui-col-sm-6 mdui-m-b-3">
+      <div class="mdui-panel mdui-panel-gapless" id="panel">
+        <div class="mdui-panel-item" id="item-1">
+          <div class="mdui-panel-item-header" onclick="item1()">{{guide-check}}</div>
+          <div class="mdui-panel-item-body">
+            <ul class="mdui-list mdui-list-dense">
+              <li class="mdui-list-item mdui-ripple">
+                <i class="mdui-icon material-icons mdui-text-color-green mdui-m-r-1" style="font-size: 40px;">check_circle</i>
+                <div class="mdui-list-item-content">
+                  <div class="mdui-list-item-title" style="font-size: 20px;">HTTP {{services}}</div>
+                  <div class="mdui-list-item-text mdui-list-item-two-line">
+                    {{guide-http-tips}}
+                  </div>
+                </div>
+              </li>
+              <li class="mdui-divider-inset mdui-m-y-0"></li>
+              <li class="mdui-list-item mdui-ripple">
+                <i class="mdui-icon material-icons mdui-text-color-red mdui-m-r-1" style="font-size: 40px;" id="wsi">info</i>
+                <div class="mdui-list-item-content">
+                  <div class="mdui-list-item-title" style="font-size: 20px;">WebSocket {{services}}</div>
+                  <div class="mdui-list-item-text mdui-list-item-two-line" id="wst">
+                    {{guide-ws-tips}}
+                  </div>
+                </div>
+              </li>
+              <li class="mdui-divider-inset mdui-m-y-0"></li>
+              <li class="mdui-list-item mdui-ripple">
+                <i class="mdui-icon material-icons mdui-text-color-red mdui-m-r-1" style="font-size: 40px;" id="jrei">info</i>
+                <div class="mdui-list-item-content">
+                  <div class="mdui-list-item-title" style="font-size: 20px;">JRE {{version}}</div>
+                  <div class="mdui-list-item-text mdui-list-item-two-line">
+                    {{guide-jre-tips}}
+                  </div>
+                </div>
+              </li>
+            </ul>
+            <div class="mdui-divider"></div>
+            <button class="mdui-btn mdui-ripple mdui-color-pink-accent mdui-m-t-1 mdui-center" onclick="next()">{{next}}</button>
+          </div>
+        </div>
+        <div class="mdui-panel-item" id="item-2">
+          <div class="mdui-panel-item-header" onclick="item2()">{{panel-setting}}</div>
+          <div class="mdui-panel-item-body">
+            <h4 class="mdui-typo mdui-color-red mdui-text-center" id="warning">{{guide-warning}}</h4>
+            <div class="mdui-textfield mdui-textfield-floating-label">
+              <label class="mdui-textfield-label">{{username}}</label>
+              <input class="mdui-textfield-input" type="text" id="user"/>
+              <div class="mdui-textfield-helper">{{guide-user-tips}}</div>
+            </div>
+            <div class="mdui-textfield mdui-textfield-floating-label">
+              <label class="mdui-textfield-label">{{password}}</label>
+              <input class="mdui-textfield-input" type="password" id="password"/>
+              <div class="mdui-textfield-helper">{{guide-password-tips}}</div>
+            </div>
+            <div class="mdui-textfield mdui-textfield-floating-label">
+              <label class="mdui-textfield-label">WebSocket {{port}}</label>
+              <input class="mdui-textfield-input" type="number" id="port"/>
+              <div class="mdui-textfield-helper">{{guide-ws-port-tips}}</div>
+            </div>
+            <div class="mdui-textfield mdui-textfield-floating-label">
+              <label class="mdui-textfield-label">{{panel-enter}}</label>
+              <input class="mdui-textfield-input" type="text" value="admin" id="entry"/>
+              <div class="mdui-textfield-helper">{{guide-enter-tips}}</div>
+            </div>
+            <ul class="mdui-list">
+
+              <li class="mdui-list-item mdui-ripple" id="ftp">
+                <i class="mdui-list-item-icon mdui-icon material-icons">insert_drive_file</i>
+                <div class="mdui-list-item-content">FTP {{server}}</div>
+                <label class="mdui-switch" >
+                  <input type="checkbox" id="ftpValue"/>
+                  <i class="mdui-switch-icon"></i>
+                </label>
+              </li>
+
+              <li class="mdui-hidden" id="ftpPort">
+                <div class="mdui-textfield mdui-textfield-floating-label mdui-center" style="width: 80%">
+                  <label class="mdui-textfield-label">FTP {{port}}</label>
+                  <input class="mdui-textfield-input" type="number" value="2121" id="ftpp"/>
+                </div>
+              </li>
+
+              <li class="mdui-list-item mdui-ripple" id="web">
+                <i class="mdui-list-item-icon mdui-icon material-icons">cloud_circle</i>
+                <div class="mdui-list-item-content">{{website-construction}}</div>
+                <label class="mdui-switch">
+                  <input type="checkbox" id="website"/>
+                  <i class="mdui-switch-icon"></i>
+                </label>
+              </li>
+
+            </ul>
+            <div class="mdui-divider"></div>
+            <button class="mdui-btn mdui-ripple mdui-color-pink-accent mdui-m-t-1 mdui-center" onclick="complete()">{{ok}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="mdui-dialog" id="language">
+  <div class="mdui-dialog-title">{{select-lang}}</div>
+  <div class="mdui-dialog-actions mdui-dialog-actions-stacked">
+    <button class="mdui-btn mdui-ripple" onclick="selectLang('auto')">{{lang-auto}}</button>
+    <button class="mdui-btn mdui-ripple" onclick="selectLang('chs')">中文(简体)</button>
+    <button class="mdui-btn mdui-ripple" onclick="selectLang('cht')">中文(繁體)</button>
+    <button class="mdui-btn mdui-ripple" onclick="selectLang('eng')">English</button>
+  </div>
+</div>
+</body>
+<script>
+var ws = new WebSocket("ws://" + document.domain + ":20000");
+
+function toString(json) {
+    return JSON.stringify(json);
+}
+
+function toJson(str) {
+    return JSON.parse(str);
+}
+
+function send(string) {
+    if(ws.readyState > 1) {
+        tips("{{ws-disconnect}}");
+        return;
+    }
+    ws.send(string);
+}
+
+function setToken(token) {
+    $.cookie('token', token, { expires: 7, path: '/admin' });
+}
+
+function getToken() {
+    return $.cookie('token');;
+}
+
+function gotoPage(page) {
+    window.location.href="http://" + document.domain+":" + location.port + "/" + page;
+}
+
+function tips(str) {
+    mdui.alert(str);
+}
+      var wss = false;
+      var jres = {{guide.jre.status}};
+
+		//建立连接事件
+		ws.onopen = function(evt) {
+          var i = document.getElementById("wsi");
+          i.className = "mdui-icon material-icons mdui-text-color-green mdui-m-r-1";
+          i.innerText = "check_circle";
+          document.getElementById("wst").innerText = "{{guide-ws-ok}}";
+          wss = true;
+          check();
+		};
+
+		//消息接收事件
+		ws.onmessage = function(event) {
+			var data = JSON.parse(event.data);
+			console.log(data.type)
+			 if (data.type == "TIPS") {
+                tips(data.message);
+             } else if(data.type == "GOTO") {
+                gotoPage(data.page);
+             }
+		};
+
+      var inst = new mdui.Panel('#panel', true);
+      inst.open("#item-1")
+
+      var jrei = document.getElementById("jrei");
+      if(jres) {
+        jrei.className = "mdui-icon material-icons mdui-text-color-green mdui-m-r-1";
+        jrei.innerText = "check_circle";
+      } else {
+        jrei.className = "mdui-icon material-icons mdui-text-color-red mdui-m-r-1";
+        jrei.innerText = "info";
+      }
+      check();
+      function check() {
+        if(wss && jres) {
+          document.getElementById("warning").className = "mdui-hidden"
+        }
+      }
+      function item1() {
+        inst.close("#item-1")
+        inst.close("#item-2")
+      }
+      function item2() {
+        inst.close("#item-1")
+        inst.close("#item-2")
+      }
+      function next() {
+        inst.close("#item-1")
+        inst.open("#item-2")
+      }
+
+      new mdui.Tooltip('#ftp', {
+        content: '{{guide-ftp-tips}}'
+      });
+      new mdui.Tooltip('#web', {
+        content: '{{guide-site-tips}}'
+      });
+      document.getElementById("ftpValue").addEventListener("click",function(e){
+        if(e.target.tagName=="INPUT"){
+          var status = document.getElementById("ftpValue").checked
+          if (status) {
+            document.getElementById("ftpPort").className = ""
+          } else {
+            document.getElementById("ftpPort").className = "mdui-hidden"
+          }
+        }
+      })
+      function selectLang(l) {
+          window.location.href="/admin/guide/?lang=" + l
+      }
+      function getUrl(variable) {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i=0;i<vars.length;i++) {
+          var pair = vars[i].split("=");
+          if(pair[0] == variable){return pair[1];}
+        }
+        return(false);
+      }
+      if (getUrl("lang") == false) {
+        new mdui.Dialog("#language").open();
+      }
+
+      function complete() {
+        var user = document.getElementById("user").value;
+        var password = document.getElementById("password").value;
+        var port = document.getElementById("port").value;
+        var entry = document.getElementById("entry").value;
+        var ftp = document.getElementById("ftpValue").checked;
+        var website = document.getElementById("website").checked;
+        var ftpp = document.getElementById("ftpp").value;
+        if(
+          user == "" ||
+          password == "" ||
+          entry == ""
+        ) {
+          tips("{{请填写完整}}")
+        } else if (port > 65536 || port < 0){
+          tips("{{Websocket端口范围应在0-65535之间}}")
+        } else if (ftpp > 65536 || ftpp < 0){
+          tips("{{FTP端口范围应在0-65535之间}}")
+        } else {
+            var json = {};
+			json.username = user;
+			json.password = password
+			json.entry = entry;
+			json.port = (port == "")?-1:port;
+			json.ftp = ftp;
+			json.ftpPort = ftpp;
+			json.website = website;
+			json.lang = "{{guide.lang}}";
+			json.type = 'GUIDE';
+			send(toString(json));
+        }
+      }
+	</script>
+</html>

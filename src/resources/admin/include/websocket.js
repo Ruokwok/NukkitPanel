@@ -20,7 +20,7 @@ function send(string) {
 }
 
 function setToken(token) {
-    $.cookie('token', token, { expires: 7, path: '/admin' });
+    $.cookie('token', token, { expires: 7, path: '{{web.entry}}' });
 }
 
 function getToken() {
@@ -28,11 +28,11 @@ function getToken() {
 }
 
 function gotoPage(page) {
-    window.location.href="http://" + document.domain+":" + location.port + "/admin/" + page;
+    window.location.href="http://" + document.domain+":" + location.port + "{{web.entry}}/" + page;
 }
 
 function quit() {
-    $.cookie('token', '', { expires: 7, path: '/admin' });;
+    $.cookie('token', '', { expires: 7, path: '{{web.entry}}' });;
     gotoPage("login");
 }
 

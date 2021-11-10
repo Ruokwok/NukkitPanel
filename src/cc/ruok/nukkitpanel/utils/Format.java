@@ -31,7 +31,8 @@ public class Format {
                     .replaceAll("\\{\\{js.websocket}}", Matcher.quoteReplacement(ws)))
                     .replaceAll("\\{\\{ws.port}}", String.valueOf(WebSocketServer.port()))
                     .replaceAll("\\{\\{web.version}}", Main.getInstance().getDescription().getVersion())
-                    .replaceAll("\\{\\{web.charset}}", Config.getCharset());
+                    .replaceAll("\\{\\{web.charset}}", Config.getCharset())
+                    .replaceAll("\\{\\{web.entry}}", Config.getEntry());
         } catch (IOException e) {
             e.printStackTrace();
             return html;
