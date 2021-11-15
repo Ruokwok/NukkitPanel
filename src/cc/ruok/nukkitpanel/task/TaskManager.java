@@ -15,6 +15,7 @@ public class TaskManager {
 
     private static TaskList list;
     private static Logger logger = Main.getInstance().getLogger();
+    private static Scheduler scheduler;
 
     public static void load() {
         try {
@@ -40,17 +41,31 @@ public class TaskManager {
     }
 
     public static void update() {
+        SchedulerFactory schedulerFactory = new StdSchedulerFactory();
+        try {
+            Scheduler sched = schedulerFactory.getScheduler();
+            sched.pauseAll();
+            sched.shutdown();
+            scheduler.shutdown();
+        } catch (NullPointerException e) {
+//            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         for (int i = 0; i < list.list.size(); i++) {
             try {
-                quartz(i);
+                if (list.list.get(i).status) {
+                    quartz(i);
+                }
             } catch (Exception e) {
+                e.printStackTrace();
                 logger.warning("Cron表达式无效: " + list.list.get(i).expression + " /" + list.list.get(i).title);
             }
         }
     }
 
     public static void quartz(int i) throws SchedulerException {
-        Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+        scheduler = StdSchedulerFactory.getDefaultScheduler();
         JobDetail job = JobBuilder.newJob(TaskJob.class).withIdentity(String.valueOf(i), "base").build();
         CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(String.valueOf(i),
                 "base").withSchedule(CronScheduleBuilder.cronSchedule(list.list.get(i).expression)).build();

@@ -158,4 +158,8 @@ port=端口
 guide-fail=无法完成设置！
 guide-complete=面板配置完成！请重启服务器。
 guide-exception=出现异常:
-
+please-complete=请填写完整
+ws-port-error=Websocket端口范围应在0-65535之间
+ftp-port-error=FTP端口范围应在0-65535之间
+pause=暂停
+resume=恢复

@@ -28,4 +28,8 @@ public class TaskList {
         list.add(task);
     }
 
+    public void pause(int i) {
+        list.get(i).status = !list.get(i).status;
+    }
+
 }

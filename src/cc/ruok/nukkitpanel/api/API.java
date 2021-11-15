@@ -31,7 +31,6 @@ import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -85,6 +84,7 @@ public class API {
         apis.put("GET_TASKS", taskList());
         apis.put("CREATE_TASK", createTask());
         apis.put("DELETE_TASK", deleteTask());
+        apis.put("PAUSE_TASK", pauseTask());
         apis.put("BPM_SEARCH", bpmSearch());
         apis.put("BPM_INFO", bpmInfo());
         apis.put("BPM_OPERATION", bpmOperation());
@@ -644,6 +644,7 @@ public class API {
             task.title = json.title;
             task.expression = json.cron;
             task.command = json.command.split("\n");
+            task.status = true;
             boolean add = TaskManager.add(task);
             GetTasksJson j = gson.fromJson(p, GetTasksJson.class);
             j.tasks = TaskManager.getList();
@@ -661,6 +662,19 @@ public class API {
             TaskManager.getList().list.remove(json.key);
             TaskManager.getList().save();
             TaskManager.removeJob(String.valueOf(json.key));
+            GetTasksJson j = gson.fromJson(p, GetTasksJson.class);
+            j.tasks = TaskManager.getList();
+            s.send(j.toString());
+            return null;
+        };
+    }
+
+    private Handler pauseTask() {
+        return (p,s) -> {
+            TaskPauseJson json = gson.fromJson(p, TaskPauseJson.class);
+            TaskManager.getList().pause(json.key);
+            TaskManager.getList().save();
+            TaskManager.update();
             GetTasksJson j = gson.fromJson(p, GetTasksJson.class);
             j.tasks = TaskManager.getList();
             s.send(j.toString());

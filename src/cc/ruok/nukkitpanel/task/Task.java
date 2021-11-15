@@ -8,4 +8,6 @@ public class Task {
 
     public String[] command;
 
+    public boolean status;
+
 }

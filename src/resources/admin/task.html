@@ -66,6 +66,14 @@
 			}
 		}
 
+		function pauseTask(i) {
+		    var json = {};
+			json.type = "PAUSE_TASK";
+			json.token = getToken();
+			json.key = i;
+			send(toString(json));
+		}
+
 		//建立连接事件
 		ws.onopen = function(evt) {
 			var json = {};
@@ -105,7 +113,11 @@
 
 					var run = document.createElement('i');
 					run.innerText = "alarm_on";
-					run.className = "mdui-icon material-icons mdui-text-color-green";
+					if(data.tasks.list[i].status) {
+					    run.className = "mdui-icon material-icons mdui-text-color-green";
+					} else {
+					    run.className = "mdui-icon material-icons mdui-text-color-red";
+					}
 
 					var title = document.createElement('div');
 					title.className = "mdui-panel-item-title mdui-m-l-3";
@@ -138,6 +150,15 @@
 					button.innerText = "{{delete}}";
 					button.setAttribute("onclick","deleteTask(" + i + ")");
 
+                    var button1 = document.createElement('button');
+					button1.className = "mdui-btn mdui-ripple mdui-color-theme mdui-m-a-1";
+					if(data.tasks.list[i].status) {
+					    button1.innerText = "{{pause}}";
+					} else {
+					    button1.innerText = "{{resume}}";
+					}
+					button1.setAttribute("onclick","pauseTask(" + i + ")");
+
 
 					item.appendChild(head);
 					item.appendChild(body);
@@ -148,6 +169,7 @@
 					head.appendChild(ic);
 					body.appendChild(typo);
 					body.appendChild(button);
+					body.appendChild(button1);
 					panel.appendChild(item);
 				}
 

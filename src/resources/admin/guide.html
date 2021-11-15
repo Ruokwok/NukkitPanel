@@ -10,8 +10,9 @@
 <h1 class="mdui-typo mdui-text-center">{{setting-guide}}</h1>
 <div class="mdui-container">
 
-  <div class="mdui-row">
-    <div class="mdui-col-sm-6 mdui-m-b-3">
+  <div class="row">
+<!--    <div class="mdui-col-sm-12 mdui-m-b-3">-->
+    <div class="mdui-center" id="screen" style="width:500px">
       <div class="mdui-panel mdui-panel-gapless" id="panel">
         <div class="mdui-panel-item" id="item-1">
           <div class="mdui-panel-item-header" onclick="item1()">{{guide-check}}</div>
@@ -124,6 +125,13 @@
 </div>
 </body>
 <script>
+var screen = document.getElementById("screen");
+if ((document.body.clientWidth / document.body.clientHeight) < 5) {
+  screen.style="width:100%"
+} else {
+  screen.style="width:500px"
+}
+
 var ws = new WebSocket("ws://" + document.domain + ":20000");
 
 function toString(json) {
@@ -256,11 +264,11 @@ function tips(str) {
           password == "" ||
           entry == ""
         ) {
-          tips("{{请填写完整}}")
+          tips("{{please-complete}}")
         } else if (port > 65536 || port < 0){
-          tips("{{Websocket端口范围应在0-65535之间}}")
+          tips("{{ws-port-error}}")
         } else if (ftpp > 65536 || ftpp < 0){
-          tips("{{FTP端口范围应在0-65535之间}}")
+          tips("{{ftp-port-error}}")
         } else {
             var json = {};
 			json.username = user;
