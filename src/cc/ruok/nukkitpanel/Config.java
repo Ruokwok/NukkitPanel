@@ -23,6 +23,7 @@ public class Config {
     private static boolean site;
     private static boolean status = false;
     private static String entry;
+    private static boolean log;
 
     public static void load() {
         try {
@@ -38,6 +39,7 @@ public class Config {
             mdui = properties.getProperty("local-mdui").equals("on");
             ftp = properties.getProperty("ftp-server").equals("on");
             site = properties.getProperty("website").equals("on");
+            log = properties.getProperty("panel-logs").equals("on");
             ftpPort = Integer.parseInt(properties.getProperty("ftp-port"));
             int wp = 0;
             try {
