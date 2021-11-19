@@ -1,5 +1,6 @@
 package cc.ruok.nukkitpanel.servers.http;
 
+import cc.ruok.nukkitpanel.Log;
 import cc.ruok.nukkitpanel.servers.Auth;
 import cc.ruok.nukkitpanel.Main;
 import cc.ruok.nukkitpanel.R;
@@ -138,6 +139,7 @@ class PanelHandler {
             if (Auth.getInstance().check(token) == 1) {
                 File f = new File(file);
                 byte[] bytes = FileUtils.readFileToByteArray(f);
+                Log.info(R.get("download-file") + ": " + file);
                 http.getResponseHeaders().add("Content-Type", "application/octet-stream; charset=" + Config.getCharset());
                 http.getResponseHeaders().add("Content-Disposition", "attachment;filename=" + f.getName());
                 http.sendResponseHeaders(200, bytes.length);

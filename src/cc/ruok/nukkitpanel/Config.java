@@ -141,4 +141,8 @@ public class Config {
     public static String getEntry() {
         return entry;
     }
+
+    public static boolean onLogs() {
+        return log;
+    }
 }

@@ -80,4 +80,10 @@ public class Log {
         return map;
     }
 
+    public static void info(String str) {
+        if (Config.onLogs()) {
+            Main.getInstance().getLogger().info(str);
+        }
+    }
+
 }

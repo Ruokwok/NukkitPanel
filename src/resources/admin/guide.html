@@ -94,6 +94,15 @@
                 </div>
               </li>
 
+              <li class="mdui-list-item mdui-ripple" id="log">
+                <i class="mdui-list-item-icon mdui-icon material-icons">assignment</i>
+                <div class="mdui-list-item-content">{{panel-logs}}</div>
+                <label class="mdui-switch">
+                  <input type="checkbox" id="logs"/>
+                  <i class="mdui-switch-icon"></i>
+                </label>
+              </li>
+
               <li class="mdui-list-item mdui-ripple" id="web">
                 <i class="mdui-list-item-icon mdui-icon material-icons">cloud_circle</i>
                 <div class="mdui-list-item-content">{{website-construction}}</div>
@@ -225,6 +234,11 @@ function tips(str) {
       new mdui.Tooltip('#web', {
         content: '{{guide-site-tips}}'
       });
+
+      new mdui.Tooltip('#log', {
+        content: '{{guide-log-tips}}'
+      });
+
       document.getElementById("ftpValue").addEventListener("click",function(e){
         if(e.target.tagName=="INPUT"){
           var status = document.getElementById("ftpValue").checked
@@ -258,6 +272,7 @@ function tips(str) {
         var entry = document.getElementById("entry").value;
         var ftp = document.getElementById("ftpValue").checked;
         var website = document.getElementById("website").checked;
+        var logs = document.getElementById("logs").checked;
         var ftpp = document.getElementById("ftpp").value;
         if(
           user == "" ||
@@ -278,6 +293,7 @@ function tips(str) {
 			json.ftp = ftp;
 			json.ftpPort = ftpp;
 			json.website = website;
+			json.log = logs;
 			json.lang = "{{guide.lang}}";
 			json.type = 'GUIDE';
 			send(toString(json));

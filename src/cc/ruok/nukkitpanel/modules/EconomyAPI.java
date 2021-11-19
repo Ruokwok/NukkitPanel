@@ -1,5 +1,6 @@
 package cc.ruok.nukkitpanel.modules;
 
+import cc.ruok.nukkitpanel.Log;
 import cc.ruok.nukkitpanel.R;
 import cc.ruok.nukkitpanel.api.API;
 import cc.ruok.nukkitpanel.api.json.EconomyAllListJson;
@@ -54,6 +55,7 @@ public class EconomyAPI extends Module {
         EconomyEditJson j = new Gson().fromJson(json, EconomyEditJson.class);
         economyAPI.setMoney(j.player, j.value);
         economyAPI.saveAll();
+        Log.info(R.get("economy-edit").replaceFirst("%P%", j.player) + ": " + j.value);
         socket.send(new TipsJson(R.get("success")).toString());
         return null;
     }
@@ -61,6 +63,7 @@ public class EconomyAPI extends Module {
     private String add(String json, WebSocket socket) {
         EconomyEditJson j = new Gson().fromJson(json, EconomyEditJson.class);
         economyAPI.addMoney(j.player, j.value);
+        Log.info(R.get("economy-add").replaceFirst("%P%", j.player) + ": " + j.value);
         economyAPI.saveAll();
         socket.send(new TipsJson(R.get("success")).toString());
         return null;
@@ -69,6 +72,7 @@ public class EconomyAPI extends Module {
     private String reduce(String json, WebSocket socket) {
         EconomyEditJson j = new Gson().fromJson(json, EconomyEditJson.class);
         economyAPI.reduceMoney(j.player, j.value);
+        Log.info(R.get("economy-reduce").replaceFirst("%P%", j.player) + ": " + j.value);
         economyAPI.saveAll();
         socket.send(new TipsJson(R.get("success")).toString());
         return null;

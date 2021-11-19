@@ -150,6 +150,7 @@ public class API {
             String port = (json.port >= 0)? String.valueOf(json.port) : "auto";
             String entry = json.entry.trim();
             String ftp = (json.ftp)? "on" : "off";
+            String log = (json.log)? "on" : "off";
             int ftpPort = (json.ftpPort >= 0)? json.ftpPort : Net.getPortOfTCP();
             String website = (json.website)? "on" : "off";
             properties.setProperty("username", username);
@@ -157,6 +158,7 @@ public class API {
             properties.setProperty("language", language);
             properties.setProperty("websocket-port", port);
             properties.setProperty("panel-entry", entry);
+            properties.setProperty("panel-logs", log);
             properties.setProperty("ftp-server", ftp);
             properties.setProperty("ftp-port", String.valueOf(ftpPort));
             properties.setProperty("website", website);
@@ -192,6 +194,7 @@ public class API {
 
     private Handler main() {
         return (p,s) -> {
+            //Log.info(R.get("access-main"));
             new Thread(()->{
                 Runtime runtime = Runtime.getRuntime();
                 Server server = Server.getInstance();
@@ -309,6 +312,7 @@ public class API {
                 list.add(pj);
             }
             s.send(new Gson().toJson(list));
+            Log.info(R.get("get-plugins"));
             return null;
         };
     }
@@ -318,15 +322,19 @@ public class API {
             SetPluginJson json = gson.fromJson(p, SetPluginJson.class);
             Plugin plugin = manager.getPlugin(json.name);
             if (json.on == 1) {
+                Log.info(R.get("enable-plugin") + ": " + json.name);
                 server.getPluginManager().enablePlugin(plugin);
             } else if (json.on == 0){
+                Log.info(R.get("disable-plugin") + ": " + json.name);
                 server.getPluginManager().disablePlugin(plugin);
             } else if (json.on == 2) {
+                Log.info(R.get("reload-plugin") + " :" + json.name);
                 server.getPluginManager().disablePlugin(plugin);
                 server.getPluginManager().enablePlugin(plugin);
             } else if (json.on == 3) {
                 try {
                     new BPM().delete(plugin, server);
+                    Log.info(R.get("delete-plugin") + ": " + json.name);
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -351,6 +359,7 @@ public class API {
 
     private Handler getPlayers() {
         return (p,s) -> {
+            Log.info(R.get("get-players"));
             new Thread(() -> {
                 while (true) {
                     try {
@@ -401,6 +410,7 @@ public class API {
             j.deviceID = player.getLoginChainData().getDeviceId();
             j.address = player.getAddress();
             s.send(j.toString());
+            Log.info(R.get("get-player-info") + ": " + json.player);
             return null;
         };
     }
@@ -412,24 +422,31 @@ public class API {
             switch (json.oper) {
                 case "MESSAGE":
                     player.sendMessage(json.msg);
+                    Log.info(R.get("send-message-2-player").replaceFirst("%P%", json.player) + ": " + json.msg);
                     break;
                 case "TITLE":
                     player.sendTitle(json.msg);
+                    Log.info(R.get("send-title-2-player").replaceFirst("%P%", json.player) + ": " + json.msg);
                     break;
                 case "SUBTITLE":
                     player.sendTitle("", json.msg);
+                    Log.info(R.get("send-subtitle-2-player").replaceFirst("%P%", json.player) + ": " + json.msg);
                     break;
                 case "TIPS":
                     player.sendTip(json.msg);
+                    Log.info(R.get("send-tips-2-player").replaceFirst("%P%", json.player) + ": " + json.msg);
                     break;
                 case "OP":
                     player.setOp(json.bool);
+                    Log.info(R.get("set-player-op") + "[" + json.player + "] " + json.bool);
                     break;
                 case "KICK":
                     player.kick();
+                    Log.info(R.get("kick-player-1") + ": " + json.player);
                     break;
                 case "MODE":
                     player.setGamemode(json.i);
+                    Log.info(R.get("set-player-gm") + "[" + json.player + "] " + json.i);
             }
             return null;
         };
@@ -443,6 +460,7 @@ public class API {
             j.position = "";
             j.list = list;
             s.send(new Gson().toJson(j));
+            Log.info(R.get("get-files") + ": /");
             return null;
         };
     }
@@ -455,6 +473,7 @@ public class API {
             j.position = json.path;
             j.list = list;
             s.send(new Gson().toJson(j));
+            Log.info(R.get("get-files") + ": " + j.position);
             return null;
         };
     }
@@ -464,7 +483,9 @@ public class API {
             FileDeleteJson json = gson.fromJson(p, FileDeleteJson.class);
             for (int i = 0; i < json.files.length; i++) {
                 try {
-                    FileUtils.forceDelete(new File(((json.path.equals(""))?"":json.path+"/")+json.files[i]));
+                    String file = ((json.path.equals("")) ? "" : json.path + "/") + json.files[i];
+                    FileUtils.forceDelete(new File(file));
+                    Log.info(R.get("delete-files") + ": " + file);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -483,6 +504,7 @@ public class API {
             FileRenameJson json = gson.fromJson(p, FileRenameJson.class);
             String path = (json.path.equals(""))?"":json.path+"/";
             FileIO.rename(path + json.file, path + json.newname);
+            Log.info(R.get("rename-file") + ": " + path + json.file + "->" + path + json.newname);
             ArrayList<FileInfo> list = FileIO.getFileList((json.path.equals(""))?"./":json.path);
             FileListJson j = new FileListJson();
             j.position = json.path;
@@ -505,6 +527,7 @@ public class API {
                     } else {
                         FileUtils.moveFile(file, new File(target + json.files[i]));
                     }
+                    Log.info(R.get("move-file") + ": " + file + "->" + target + json.files[i]);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -531,6 +554,7 @@ public class API {
                     } else {
                         FileUtils.copyFile(file, new File(target + json.files[i]));
                     }
+                    Log.info(R.get("copy-file") + ": " + file + "->" + target + json.files[i]);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -549,8 +573,10 @@ public class API {
             ShutdownJson json = gson.fromJson(p, ShutdownJson.class);
             if (json.stop) {
                 Server.getInstance().shutdown();
+                Log.info(R.get("shutdown-server"));
             } else {
                 Server.getInstance().reload();
+                Log.info(R.get("reload-server"));
             }
             return null;
         };
@@ -567,6 +593,7 @@ public class API {
                     String content = Common.ch2Unicode(FileUtils.readFileToString(file, "UTF-8"));
                     j.content = Base64.getEncoder().encodeToString(content.getBytes("UTF-8"));
                     j.code = 200;
+                    Log.info(R.get("read-file") + " :" + json.file);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -584,6 +611,7 @@ public class API {
             try {
                 FileUtils.writeStringToFile(new File(json.file), Common.decodeUnicode(new String(Base64.getDecoder().decode(json.content))), "UTF-8");
                 s.send(new TipsJson(R.get("file-save-success")).toString());
+                Log.info(R.get("edit-file") + ": " + json.file);
             } catch (IOException e) {
                 s.send(new TipsJson(R.get("file-save-fail") + e.getMessage()).toString());
                 e.printStackTrace();
@@ -597,6 +625,7 @@ public class API {
             FileCreateJson json = gson.fromJson(p, FileCreateJson.class);
             if (json.dir) {
                 new File(json.name).mkdir();
+                Log.info(R.get("make-dir") + ": " + json.name);
                 ArrayList<FileInfo> list = FileIO.getFileList((json.path.equals(""))?"./":json.path);
                 FileListJson j = new FileListJson();
                 j.position = json.path;
@@ -605,6 +634,7 @@ public class API {
             } else {
                 try {
                     new File(json.name).createNewFile();
+                    Log.info(R.get("make-file") + ": " + json.name);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -621,6 +651,7 @@ public class API {
     private Handler fileUpload() {
         return (p,s) -> {
             FileUploadJson json = gson.fromJson(p, FileUploadJson.class);
+            Log.info(R.get("upload-file") + ": " + json.path + "/" + json.file);
             WebSocketServer.upload_md5 = json.md5;
             WebSocketServer.upload_name = json.file;
             WebSocketServer.upload_path = json.path;
@@ -632,6 +663,7 @@ public class API {
         return (p,s) -> {
             GetTasksJson json = gson.fromJson(p, GetTasksJson.class);
             json.tasks = TaskManager.getList();
+            Log.info(R.get("get-tasks"));
             s.send(json.toString());
             return null;
         };
@@ -646,6 +678,7 @@ public class API {
             task.command = json.command.split("\n");
             task.status = true;
             boolean add = TaskManager.add(task);
+            Log.info(R.get("make-task") + ": " + json.title);
             GetTasksJson j = gson.fromJson(p, GetTasksJson.class);
             j.tasks = TaskManager.getList();
             s.send(j.toString());
@@ -689,6 +722,7 @@ public class API {
                 BPM bpm = new BPM();
                 try {
                     HashMap<String, String> search = bpm.search(json.word);
+                    Log.info(R.get("bpm-search") + " :" + json.word);
                     json.list = search;
                     s.send(json.toString());
                 } catch (Exception e) {
@@ -717,6 +751,7 @@ public class API {
             new Thread(() -> {
                 try {
                     File file = new BPM().install(json.plugin, json.version);
+                    Log.info(R.get("bpm-install") + ": " + json.plugin + " v" + json.version);
                     if (file.exists()) {
                         s.send(new TipsJson(json.plugin + " v" + json.version + " " + R.get("bpm-installed")).toString());
                         Plugin plugin = server.getPluginManager().loadPlugin(file);

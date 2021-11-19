@@ -18,6 +18,8 @@ public class GuideJson extends Json {
 
     public String lang;
 
+    public boolean log;
+
     public GuideJson() {
         type = "GUIDE";
     }
