@@ -203,7 +203,7 @@ ws.onmessage = function(event) {
 			ic.className = (fl[i].dir)? "mdui-icon material-icons mdui-text-color-orange": "mdui-icon material-icons mdui-text-color-blue";
 			var file = document.createElement('td');
 			file.innerText = fl[i].name;
-			file.setAttribute("onClick", "toPath('"+fl[i].name+"')");
+			file.setAttribute("onClick", "toPath('"+fl[i].name+"',"+fl[i].dir+")");
 			var type = document.createElement('td');
 			type.innerText = (fl[i].dir)? "{{dir}}": getType(fl[i].name);
 			var size = document.createElement('td');
@@ -274,7 +274,10 @@ function end(str, target) {
 	}
 }
 
-function toPath(path) {
+function toPath(path, dir) {
+    if (!dir) {
+        return;
+    }
 	var json = {};
 	json.type = "TO_PATH";
 	json.token = getToken();
@@ -287,7 +290,7 @@ function toPath(path) {
 }
 
 function update() {
-	toPath("@");
+	toPath("@", false);
 }
 
 function back() {
